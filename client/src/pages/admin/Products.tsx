@@ -63,28 +63,28 @@ export default function Products() {
   const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-  
+
   // Get URL params
   const urlParams = new URLSearchParams(location.split("?")[1] || "");
   const actionParam = urlParams.get("action");
-  
+
   // Open dialog if action=new in URL
   useState(() => {
     if (actionParam === "new") {
       setOpenDialog(true);
     }
   });
-  
+
   // Fetch products
   const { data: products, isLoading: productsLoading } = useQuery({
     queryKey: ["/api/products"],
   });
-  
+
   // Fetch categories for select dropdown
   const { data: categories, isLoading: categoriesLoading } = useQuery({
     queryKey: ["/api/categories"],
   });
-  
+
   // Create product form
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(insertProductSchema),
@@ -97,7 +97,7 @@ export default function Products() {
       discount: 0
     },
   });
-  
+
   // Reset form when dialog opens/closes or when selectedProduct changes
   useState(() => {
     if (openDialog) {
@@ -124,7 +124,7 @@ export default function Products() {
       }
     }
   }, [openDialog, selectedProduct]);
-  
+
   // Create product mutation
   const createMutation = useMutation({
     mutationFn: async (data: ProductFormValues) => {
@@ -149,7 +149,7 @@ export default function Products() {
       });
     },
   });
-  
+
   // Update product mutation
   const updateMutation = useMutation({
     mutationFn: async (data: { id: number; data: ProductFormValues }) => {
@@ -173,7 +173,7 @@ export default function Products() {
       });
     },
   });
-  
+
   // Delete product mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
@@ -197,7 +197,7 @@ export default function Products() {
       });
     },
   });
-  
+
   // Form submit handler
   const onSubmit = (data: ProductFormValues) => {
     // Parse categoryId to number
@@ -206,14 +206,14 @@ export default function Products() {
       categoryId: data.categoryId ? Number(data.categoryId) : undefined,
       discount: Number(data.discount)
     };
-    
+
     if (selectedProduct) {
       updateMutation.mutate({ id: selectedProduct.id, data: formData });
     } else {
       createMutation.mutate(formData);
     }
   };
-  
+
   // Filter products by search query
   const filteredProducts = searchQuery.trim() === ""
     ? products
@@ -221,23 +221,23 @@ export default function Products() {
         product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (product.description && product.description.toLowerCase().includes(searchQuery.toLowerCase()))
       );
-  
+
   const handleEdit = (product: any) => {
     setSelectedProduct(product);
     setOpenDialog(true);
   };
-  
+
   const handleDelete = (product: any) => {
     setSelectedProduct(product);
     setOpenDeleteDialog(true);
   };
-  
+
   return (
     <AdminLayout>
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold">Products</h1>
-          
+
           <Button onClick={() => {
             setSelectedProduct(null);
             setOpenDialog(true);
@@ -246,7 +246,7 @@ export default function Products() {
             Add Product
           </Button>
         </div>
-        
+
         <div className="flex items-center space-x-2">
           <div className="relative flex-grow">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
@@ -258,7 +258,7 @@ export default function Products() {
             />
           </div>
         </div>
-        
+
         <Card>
           <CardHeader>
             <CardTitle>All Products</CardTitle>
@@ -283,7 +283,7 @@ export default function Products() {
                     ? "No products match your search query." 
                     : "You haven't added any products yet."}
                 </p>
-                
+
                 {searchQuery.trim() !== "" ? (
                   <Button variant="outline" onClick={() => setSearchQuery("")}>
                     Clear search
@@ -351,7 +351,7 @@ export default function Products() {
           </CardContent>
         </Card>
       </div>
-      
+
       {/* Add/Edit Product Dialog */}
       <Dialog open={openDialog} onOpenChange={(open) => {
         setOpenDialog(open);
@@ -371,7 +371,7 @@ export default function Products() {
                 : "Fill in the details to create a new product."}
             </DialogDescription>
           </DialogHeader>
-          
+
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <FormField
@@ -387,7 +387,7 @@ export default function Products() {
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="description"
@@ -405,7 +405,7 @@ export default function Products() {
                   </FormItem>
                 )}
               />
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
@@ -429,9 +429,12 @@ export default function Products() {
                             <div className="px-2 py-4 text-center text-sm">No categories found</div>
                           ) : (
                             categories?.map((category: any) => (
-                              <SelectItem key={category.id} value={category.id.toString()}>
-                                {category.name}
-                              </SelectItem>
+                              <SelectItem 
+                                  key={category.id || 'new'} 
+                                  value={category.id ? category.id.toString() : 'new'}
+                                >
+                                  {category.name}
+                                </SelectItem>
                             ))
                           )}
                         </SelectContent>
@@ -443,7 +446,7 @@ export default function Products() {
                     </FormItem>
                   )}
                 />
-                
+
                 <FormField
                   control={form.control}
                   name="discount"
@@ -467,7 +470,7 @@ export default function Products() {
                   )}
                 />
               </div>
-              
+
               <FormField
                 control={form.control}
                 name="specifications"
@@ -488,7 +491,7 @@ export default function Products() {
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="inStock"
@@ -509,7 +512,7 @@ export default function Products() {
                   </FormItem>
                 )}
               />
-              
+
               <DialogFooter>
                 <Button 
                   type="button" 
@@ -534,7 +537,7 @@ export default function Products() {
           </Form>
         </DialogContent>
       </Dialog>
-      
+
       {/* Delete Product Confirmation Dialog */}
       <AlertDialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
         <AlertDialogContent>

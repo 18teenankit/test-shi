@@ -1,8 +1,9 @@
+
 {
   "products": {},
   "categories": {
-    "-Infinity": {
-      "id": null,
+    "1": {
+      "id": 1,
       "name": "Hydrocarbons & Solvents",
       "createdAt": "2025-03-16T18:23:06.898Z"
     }
