@@ -144,11 +144,7 @@ export function Footer({ language = "en" }: FooterProps) {
                   </Link>
                 </li>
               ))}
-              <li>
-                <Link href="/products" className="text-gray-300 hover:text-white transition-colors">
-                  {language === "en" ? "New Arrivals" : "नए आगमन"}
-                </Link>
-              </li>
+              
             </ul>
           </div>
           
