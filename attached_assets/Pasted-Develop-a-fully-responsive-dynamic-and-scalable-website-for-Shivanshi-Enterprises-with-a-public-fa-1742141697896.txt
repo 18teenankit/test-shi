@@ -1,0 +1,70 @@
+Develop a fully responsive, dynamic, and scalable website for Shivanshi Enterprises with a public-facing site and an admin panel for managing products, categories, contact requests, hero section images, and more.
+
+🎨 Design & UI/UX
+Theme: White background with buttons and accents in #b01e2f. Additional colors can be used for better contrast and usability.
+Hero Section: Continuous sliding images (carousel effect). Images should be dynamically manageable from the admin panel.
+Dropdown for Products:
+On hover, it opens and displays product categories.
+On click, it redirects to a new page listing products under that category.
+Fully Responsive: Works on all devices (Desktop, Tablet, Mobile).
+Dark Mode Support (toggle between light/dark themes).
+Smooth Animations & Transitions for a modern UI/UX.
+Favicon & Logo dynamically changeable from the admin panel.
+🌐 Public Website Features
+✅ Home Page:
+
+Hero slideshow with dynamically managed images.
+Company introduction & featured products.
+✅ Product Categories & Listings:
+Categories appear in the dropdown menu.
+Clicking a category opens a new page listing products under that category.
+Each product has details like name, description, specifications.
+Multi-Image Support – Each product can have multiple images (carousel view).
+Stock Management – Show “In Stock / Out of Stock” dynamically.
+✅ Contact Page:
+Form Fields: Name, Email, Phone, Message, and a "Get Call Back" button.
+WhatsApp Button – One-click to directly chat on WhatsApp.
+Live Location Map Integration.
+✅ Social Media & Footer:
+Linked social media icons (Facebook, Instagram, LinkedIn, etc.).
+Company Address and Contact Details.
+✅ SEO Optimized:
+Metadata, sitemaps, and structured data for better search rankings.
+🛠️ ADMIN PANEL FEATURES
+✅ Dashboard:
+
+Overview of total products, categories, and contact inquiries.
+Quick actions for adding/deleting/editing products & categories.
+✅ Product & Category Management:
+Full CRUD: Add, edit, delete categories & products.
+Assign products to categories dynamically.
+Set discounts & offers on products.
+✅ Hero Section Management:
+Add, edit, delete images displayed in the hero section carousel.
+✅ Contact Form Management:
+View, manage, and delete customer inquiries.
+Export inquiries as CSV/Excel.
+✅ User & Security Features:
+Two-Factor Authentication (2FA) for admin login.
+Role-Based Access (RBAC):
+Super Admin (Full control).
+Manager (Limited control).
+Admin Login Attempt Limiter (blocks after failed attempts).
+✅ Backup & Analytics:
+Database Backup – Admin can download backups.
+Google Analytics & Facebook Pixel integration.
+✅ Email Notifications:
+Admin receives an email when a new contact request is submitted.
+✅ Sweet Alert Messages for Actions (add/edit/delete confirmations).
+✅ Multi-Language Support (English & Hindi switch option).
+✅ Installable Admin Panel (PWA) – Can be installed and used like a mobile app.
+✅ Admin Logout Option.
+👤 Admin Credentials:
+1️⃣ Username: Sunilgiri@admin | Password: Girisunil@4444
+2️⃣ Username: Ankit@admin | Password: Ankit@968511
+
+🚀 Performance & Optimization
+✅ Lazy Loading for Images – Faster load times.
+✅ Gzip Compression & Minified CSS/JS – Improves speed.
+✅ CDN Integration for static assets.
+✅ Live Search in Admin Panel – Quickly find products or contacts
