@@ -56,7 +56,7 @@ type CategoryFormValues = z.infer<typeof insertCategorySchema> & {
 export default function Categories() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  const [location, navigate] = useRouter();
+  const [location, navigate] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<any | null>(null);
   const [openDialog, setOpenDialog] = useState(false);
