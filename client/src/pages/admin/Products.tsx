@@ -52,9 +52,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 // Extend the product schema to match the database structure
 const extendedProductSchema = insertProductSchema.extend({
-  specifications: z.string().optional(),
-  inStock: z.boolean().default(true),
-  discount: z.number().min(0).max(100).default(0),
+  // Fields for specifications, inStock, and discount removed as requested
 });
 
 type ProductFormValues = z.infer<typeof extendedProductSchema>;
@@ -96,9 +94,7 @@ export default function Products() {
       name: "",
       description: "",
       categoryId: undefined,
-      specifications: "",
-      inStock: true,
-      discount: 0
+      // Fields for specifications, inStock, and discount removed as requested
     },
   });
 
@@ -111,9 +107,7 @@ export default function Products() {
           name: selectedProduct.name,
           description: selectedProduct.description || "",
           categoryId: selectedProduct.categoryId,
-          specifications: selectedProduct.specifications || "",
-          inStock: selectedProduct.inStock,
-          discount: selectedProduct.discount || 0
+          // Fields for specifications, inStock, and discount removed as requested
         });
       } else {
         // If creating, reset to defaults
@@ -121,9 +115,7 @@ export default function Products() {
           name: "",
           description: "",
           categoryId: undefined,
-          specifications: "",
-          inStock: true,
-          discount: 0
+          // Fields for specifications, inStock, and discount removed as requested
         });
       }
     }
@@ -217,7 +209,7 @@ export default function Products() {
     const formData = {
       ...data,
       categoryId: Number(data.categoryId),
-      discount: Number(data.discount)
+      // discount field removed as requested
     };
 
     if (selectedProduct) {
@@ -459,73 +451,7 @@ export default function Products() {
                 )}
               />
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Specifications */}
-                <FormField
-                  control={form.control}
-                  name="specifications"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Specifications</FormLabel>
-                      <FormControl>
-                        <Textarea 
-                          placeholder="Enter product specifications" 
-                          className="min-h-24"
-                          {...field} 
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <div className="space-y-4">
-                  {/* In Stock */}
-                  <FormField
-                    control={form.control}
-                    name="inStock"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                        <FormControl>
-                          <input
-                            type="checkbox"
-                            checked={field.value}
-                            onChange={field.onChange}
-                            className="h-4 w-4 mt-1"
-                          />
-                        </FormControl>
-                        <div className="space-y-1 leading-none">
-                          <FormLabel>In Stock</FormLabel>
-                          <FormDescription>
-                            Mark this product as available in stock
-                          </FormDescription>
-                        </div>
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* Discount */}
-                  <FormField
-                    control={form.control}
-                    name="discount"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Discount (%)</FormLabel>
-                        <FormControl>
-                          <Input 
-                            type="number" 
-                            min="0" 
-                            max="100" 
-                            placeholder="Enter discount percentage" 
-                            {...field} 
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
+              {/* Form fields for specifications, inStock, and discount removed as requested */}
 
               <DialogFooter>
                 <Button 
