@@ -61,13 +61,13 @@ type HeroImageFormValues = z.infer<typeof insertHeroImageSchema> & {
 export default function HeroImages() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  const [location] = useLocation();
+  const [location, navigate] = useLocation();
   const [selectedImage, setSelectedImage] = useState<any | null>(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
   // Get URL params
-  const urlParams = new URLSearchParams(location.search.substring(1));
+  const urlParams = new URLSearchParams(window.location.search);
   const actionParam = urlParams.get("action");
 
   // Open dialog if action=new in URL
