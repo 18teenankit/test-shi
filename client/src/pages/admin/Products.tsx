@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { AdminLayout } from "@/components/layouts/AdminLayout";
 import { useForm } from "react-hook-form";
@@ -13,7 +13,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
@@ -29,7 +28,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   AlertDialog,
@@ -40,7 +38,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import {
   Table,
@@ -53,7 +50,14 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 
-type ProductFormValues = z.infer<typeof insertProductSchema>;
+// Extend the product schema to match the database structure
+const extendedProductSchema = insertProductSchema.extend({
+  specifications: z.string().optional(),
+  inStock: z.boolean().default(true),
+  discount: z.number().min(0).max(100).default(0),
+});
+
+type ProductFormValues = z.infer<typeof extendedProductSchema>;
 
 export default function Products() {
   const queryClient = useQueryClient();
@@ -69,25 +73,25 @@ export default function Products() {
   const actionParam = urlParams.get("action");
 
   // Open dialog if action=new in URL
-  useState(() => {
+  useEffect(() => {
     if (actionParam === "new") {
       setOpenDialog(true);
     }
-  });
+  }, [actionParam]);
 
   // Fetch products
-  const { data: products, isLoading: productsLoading } = useQuery({
+  const { data: products = [], isLoading: productsLoading } = useQuery({
     queryKey: ["/api/products"],
   });
 
   // Fetch categories for select dropdown
-  const { data: categories, isLoading: categoriesLoading } = useQuery({
+  const { data: categories = [], isLoading: categoriesLoading } = useQuery({
     queryKey: ["/api/categories"],
   });
 
   // Create product form
   const form = useForm<ProductFormValues>({
-    resolver: zodResolver(insertProductSchema),
+    resolver: zodResolver(extendedProductSchema),
     defaultValues: {
       name: "",
       description: "",
@@ -99,7 +103,7 @@ export default function Products() {
   });
 
   // Reset form when dialog opens/closes or when selectedProduct changes
-  useState(() => {
+  useEffect(() => {
     if (openDialog) {
       // If editing, set form values from selectedProduct
       if (selectedProduct) {
@@ -123,7 +127,7 @@ export default function Products() {
         });
       }
     }
-  }, [openDialog, selectedProduct]);
+  }, [openDialog, selectedProduct, form]);
 
   // Create product mutation
   const createMutation = useMutation({
@@ -200,10 +204,19 @@ export default function Products() {
 
   // Form submit handler
   const onSubmit = (data: ProductFormValues) => {
+    // Ensure categoryId is a number and required
+    if (!data.categoryId) {
+      form.setError("categoryId", { 
+        type: "required", 
+        message: "Category is required" 
+      });
+      return;
+    }
+    
     // Parse categoryId to number
     const formData = {
       ...data,
-      categoryId: data.categoryId ? Number(data.categoryId) : undefined,
+      categoryId: Number(data.categoryId),
       discount: Number(data.discount)
     };
 
@@ -217,7 +230,7 @@ export default function Products() {
   // Filter products by search query
   const filteredProducts = searchQuery.trim() === ""
     ? products
-    : products?.filter((product: any) =>
+    : products.filter((product: any) =>
         product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (product.description && product.description.toLowerCase().includes(searchQuery.toLowerCase()))
       );
@@ -274,7 +287,7 @@ export default function Products() {
                 <Skeleton className="h-20 w-full" />
                 <Skeleton className="h-20 w-full" />
               </div>
-            ) : filteredProducts?.length === 0 ? (
+            ) : filteredProducts.length === 0 ? (
               <div className="text-center py-10">
                 <AlertTriangle className="mx-auto h-12 w-12 text-gray-400 mb-3" />
                 <h3 className="text-lg font-medium">No products found</h3>
@@ -374,6 +387,45 @@ export default function Products() {
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              {/* Category selection - First field as you requested */}
+              <FormField
+                control={form.control}
+                name="categoryId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Category</FormLabel>
+                    <Select 
+                      value={field.value?.toString() || ""} 
+                      onValueChange={field.onChange}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a category" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {categoriesLoading ? (
+                          <div className="px-2 py-4 text-center text-sm">Loading categories...</div>
+                        ) : categories.length === 0 ? (
+                          <div className="px-2 py-4 text-center text-sm">No categories found</div>
+                        ) : (
+                          categories.map((category: any) => (
+                            <SelectItem 
+                              key={category.id} 
+                              value={category.id.toString()}
+                            >
+                              {category.name}
+                            </SelectItem>
+                          ))
+                        )}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Product Name */}
               <FormField
                 control={form.control}
                 name="name"
@@ -388,6 +440,7 @@ export default function Products() {
                 )}
               />
 
+              {/* Product Description */}
               <FormField
                 control={form.control}
                 name="description"
@@ -406,36 +459,73 @@ export default function Products() {
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="categoryId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Category</FormLabel>
-                    <Select 
-                      value={field.value?.toString()} 
-                      onValueChange={field.onChange}
-                    >
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Specifications */}
+                <FormField
+                  control={form.control}
+                  name="specifications"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Specifications</FormLabel>
                       <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a category" />
-                        </SelectTrigger>
+                        <Textarea 
+                          placeholder="Enter product specifications" 
+                          className="min-h-24"
+                          {...field} 
+                        />
                       </FormControl>
-                      <SelectContent>
-                        {categories?.map((category) => (
-                          <SelectItem 
-                            key={category.id} 
-                            value={category.id.toString()}
-                          >
-                            {category.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="space-y-4">
+                  {/* In Stock */}
+                  <FormField
+                    control={form.control}
+                    name="inStock"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                        <FormControl>
+                          <input
+                            type="checkbox"
+                            checked={field.value}
+                            onChange={field.onChange}
+                            className="h-4 w-4 mt-1"
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel>In Stock</FormLabel>
+                          <FormDescription>
+                            Mark this product as available in stock
+                          </FormDescription>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Discount */}
+                  <FormField
+                    control={form.control}
+                    name="discount"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Discount (%)</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="number" 
+                            min="0" 
+                            max="100" 
+                            placeholder="Enter discount percentage" 
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
 
               <DialogFooter>
                 <Button 
@@ -459,155 +549,8 @@ export default function Products() {
               </DialogFooter>
             </form>
           </Form>
-
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Description</FormLabel>
-                    <FormControl>
-                      <Textarea 
-                        placeholder="Enter product description" 
-                        className="min-h-24" 
-                        {...field} 
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="categoryId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Category</FormLabel>
-                      <Select 
-                        value={field.value?.toString() || ""} 
-                        onValueChange={field.onChange}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a category" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {categoriesLoading ? (
-                            <div className="px-2 py-4 text-center text-sm">Loading categories...</div>
-                          ) : categories?.length === 0 ? (
-                            <div className="px-2 py-4 text-center text-sm">No categories found</div>
-                          ) : (
-                            categories?.map((category: any) => (
-                              <SelectItem 
-                                  key={category.id || 'new'} 
-                                  value={category.id ? category.id.toString() : 'new'}
-                                >
-                                  {category.name}
-                                </SelectItem>
-                            ))
-                          )}
-                        </SelectContent>
-                      </Select>
-                      <FormDescription>
-                        You can select a category for this product.
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="discount"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Discount (%)</FormLabel>
-                      <FormControl>
-                        <Input 
-                          type="number" 
-                          min="0" 
-                          max="100" 
-                          placeholder="Enter discount percentage" 
-                          {...field} 
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        Discount percentage (0-100)
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <FormField
-                control={form.control}
-                name="specifications"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Specifications</FormLabel>
-                    <FormControl>
-                      <Textarea 
-                        placeholder="Enter product specifications" 
-                        className="min-h-24" 
-                        {...field} 
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Technical details and specifications of the product.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="inStock"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                    <div className="space-y-0.5">
-                      <FormLabel className="text-base">Availability</FormLabel>
-                      <FormDescription>
-                        Mark this product as in stock or out of stock.
-                      </FormDescription>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-
-              <DialogFooter>
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  onClick={() => setOpenDialog(false)}
-                >
-                  Cancel
-                </Button>
-                <Button 
-                  type="submit"
-                  disabled={createMutation.isPending || updateMutation.isPending}
-                >
-                  {createMutation.isPending || updateMutation.isPending
-                    ? "Saving..."
-                    : selectedProduct 
-                      ? "Update Product" 
-                      : "Create Product"
-                  }
-                </Button>
-              </DialogFooter>
-            </Form>
-          </DialogContent>
-        </Dialog>
+        </DialogContent>
+      </Dialog>
 
       {/* Delete Product Confirmation Dialog */}
       <AlertDialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
@@ -622,11 +565,7 @@ export default function Products() {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              onClick={() => {
-                if (selectedProduct) {
-                  deleteMutation.mutate(selectedProduct.id);
-                }
-              }}
+              onClick={() => deleteMutation.mutate(selectedProduct?.id)}
               className="bg-red-600 hover:bg-red-700"
               disabled={deleteMutation.isPending}
             >
