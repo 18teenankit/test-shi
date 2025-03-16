@@ -1,5 +1,13 @@
 {
-  "products": {},
+  "products": {
+    "-Infinity": {
+      "id": null,
+      "name": "HTML",
+      "description": "",
+      "categoryId": 1,
+      "createdAt": "2025-03-16T20:55:14.860Z"
+    }
+  },
   "categories": {
     "1": {
       "id": 1,
