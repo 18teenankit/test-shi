@@ -1,0 +1,10 @@
+{
+  "products": {},
+  "categories": {
+    "-Infinity": {
+      "id": null,
+      "name": "Hydrocarbons & Solvents",
+      "createdAt": "2025-03-16T18:23:06.898Z"
+    }
+  }
+}
