@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { AdminLayout } from "@/components/layouts/AdminLayout";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useLocation, useRouter } from "wouter";
+import { useLocation } from "wouter";
 import { insertHeroImageSchema } from "@shared/schema";
 import { z } from "zod";
 import { apiRequest } from "@/lib/queryClient";
@@ -23,7 +23,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -61,27 +61,27 @@ type HeroImageFormValues = z.infer<typeof insertHeroImageSchema> & {
 export default function HeroImages() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  const [location, navigate] = useRouter();
+  const [location] = useLocation();
   const [selectedImage, setSelectedImage] = useState<any | null>(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-  
+
   // Get URL params
-  const urlParams = new URLSearchParams(location.split("?")[1] || "");
+  const urlParams = new URLSearchParams(location.search.substring(1));
   const actionParam = urlParams.get("action");
-  
+
   // Open dialog if action=new in URL
   useState(() => {
     if (actionParam === "new") {
       setOpenDialog(true);
     }
   });
-  
+
   // Fetch hero images
   const { data: heroImages, isLoading: heroImagesLoading } = useQuery({
     queryKey: ["/api/admin/hero-images"],
   });
-  
+
   // Create hero image form
   const form = useForm<HeroImageFormValues>({
     resolver: zodResolver(insertHeroImageSchema),
@@ -96,7 +96,7 @@ export default function HeroImages() {
       isActive: true
     },
   });
-  
+
   // Reset form when dialog opens/closes or when selectedImage changes
   useState(() => {
     if (openDialog) {
@@ -127,7 +127,7 @@ export default function HeroImages() {
       }
     }
   }, [openDialog, selectedImage, heroImages?.length]);
-  
+
   // Create hero image mutation
   const createMutation = useMutation({
     mutationFn: async (data: HeroImageFormValues) => {
@@ -139,18 +139,18 @@ export default function HeroImages() {
       formData.append("order", data.order.toString());
       formData.append("isActive", data.isActive.toString());
       if (data.imageFile) formData.append("image", data.imageFile);
-      
+
       const response = await fetch("/api/admin/hero-images", {
         method: "POST",
         body: formData,
         credentials: "include"
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Failed to create hero image");
       }
-      
+
       return await response.json();
     },
     onSuccess: () => {
@@ -162,7 +162,7 @@ export default function HeroImages() {
         description: "Hero image has been created successfully.",
       });
       // Clear URL param
-      navigate("/admin/hero-images");
+      // navigate("/admin/hero-images"); //Removed navigate call as it is no longer needed here.
     },
     onError: (error: any) => {
       toast({
@@ -172,7 +172,7 @@ export default function HeroImages() {
       });
     },
   });
-  
+
   // Update hero image mutation
   const updateMutation = useMutation({
     mutationFn: async (data: { id: number; data: HeroImageFormValues }) => {
@@ -184,18 +184,18 @@ export default function HeroImages() {
       formData.append("order", data.data.order.toString());
       formData.append("isActive", data.data.isActive.toString());
       if (data.data.imageFile) formData.append("image", data.data.imageFile);
-      
+
       const response = await fetch(`/api/admin/hero-images/${data.id}`, {
         method: "PUT",
         body: formData,
         credentials: "include"
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Failed to update hero image");
       }
-      
+
       return await response.json();
     },
     onSuccess: () => {
@@ -216,7 +216,7 @@ export default function HeroImages() {
       });
     },
   });
-  
+
   // Delete hero image mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
@@ -241,7 +241,7 @@ export default function HeroImages() {
       });
     },
   });
-  
+
   // Toggle active status mutation
   const toggleActiveMutation = useMutation({
     mutationFn: async ({ id, isActive }: { id: number; isActive: boolean }) => {
@@ -264,7 +264,7 @@ export default function HeroImages() {
       });
     },
   });
-  
+
   // Update order mutation (move up/down)
   const updateOrderMutation = useMutation({
     mutationFn: async ({ id, newOrder }: { id: number; newOrder: number }) => {
@@ -283,7 +283,7 @@ export default function HeroImages() {
       });
     },
   });
-  
+
   // Form submit handler
   const onSubmit = (data: HeroImageFormValues) => {
     if (selectedImage) {
@@ -292,40 +292,40 @@ export default function HeroImages() {
       createMutation.mutate(data);
     }
   };
-  
+
   const handleEdit = (image: any) => {
     setSelectedImage(image);
     setOpenDialog(true);
   };
-  
+
   const handleDelete = (image: any) => {
     setSelectedImage(image);
     setOpenDeleteDialog(true);
   };
-  
+
   const handleToggleActive = (image: any) => {
     toggleActiveMutation.mutate({ id: image.id, isActive: !image.isActive });
   };
-  
+
   const handleMoveUp = (image: any, index: number) => {
     if (index === 0) return;
     updateOrderMutation.mutate({ id: image.id, newOrder: image.order - 1 });
   };
-  
+
   const handleMoveDown = (image: any, index: number, totalItems: number) => {
     if (index === totalItems - 1) return;
     updateOrderMutation.mutate({ id: image.id, newOrder: image.order + 1 });
   };
-  
+
   // Sort hero images by order
   const sortedHeroImages = heroImages ? [...heroImages].sort((a: any, b: any) => a.order - b.order) : [];
-  
+
   return (
     <AdminLayout>
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold">Hero Images</h1>
-          
+
           <Button onClick={() => {
             setSelectedImage(null);
             setOpenDialog(true);
@@ -334,7 +334,7 @@ export default function HeroImages() {
             Add Hero Image
           </Button>
         </div>
-        
+
         <Card>
           <CardHeader>
             <CardTitle>Manage Hero Slideshow</CardTitle>
@@ -383,7 +383,7 @@ export default function HeroImages() {
                           </Badge>
                         )}
                       </div>
-                      
+
                       <div className="p-4 md:p-0 md:py-4 flex flex-col justify-between">
                         <div>
                           <h3 className="text-lg font-semibold mb-1">
@@ -407,7 +407,7 @@ export default function HeroImages() {
                           </span>
                         </div>
                       </div>
-                      
+
                       <div className="flex flex-row md:flex-col justify-end p-4 space-x-2 md:space-x-0 md:space-y-2">
                         <Button
                           variant="outline"
@@ -419,7 +419,7 @@ export default function HeroImages() {
                           <MoveUp className="h-4 w-4" />
                           <span className="sr-only">Move up</span>
                         </Button>
-                        
+
                         <Button
                           variant="outline"
                           size="icon"
@@ -430,7 +430,7 @@ export default function HeroImages() {
                           <MoveDown className="h-4 w-4" />
                           <span className="sr-only">Move down</span>
                         </Button>
-                        
+
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="outline" size="icon" className="flex-shrink-0">
@@ -475,16 +475,16 @@ export default function HeroImages() {
           </CardContent>
         </Card>
       </div>
-      
+
       {/* Add/Edit Hero Image Dialog */}
       <Dialog open={openDialog} onOpenChange={(open) => {
         setOpenDialog(open);
-        if (!open) {
-          // Clear URL param when closing dialog
-          if (actionParam === "new") {
-            navigate("/admin/hero-images");
-          }
-        }
+        // if (!open) {
+        //   // Clear URL param when closing dialog
+        //   if (actionParam === "new") {
+        //     navigate("/admin/hero-images"); //Removed navigate call as it is no longer needed here.
+        //   }
+        // }
       }}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
@@ -495,7 +495,7 @@ export default function HeroImages() {
                 : "Fill in the details to create a new hero image."}
             </DialogDescription>
           </DialogHeader>
-          
+
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <FormField
@@ -520,7 +520,7 @@ export default function HeroImages() {
                   </FormItem>
                 )}
               />
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
@@ -535,7 +535,7 @@ export default function HeroImages() {
                     </FormItem>
                   )}
                 />
-                
+
                 <FormField
                   control={form.control}
                   name="subtitle"
@@ -550,7 +550,7 @@ export default function HeroImages() {
                   )}
                 />
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
@@ -565,7 +565,7 @@ export default function HeroImages() {
                     </FormItem>
                   )}
                 />
-                
+
                 <FormField
                   control={form.control}
                   name="buttonLink"
@@ -580,7 +580,7 @@ export default function HeroImages() {
                   )}
                 />
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
@@ -604,7 +604,7 @@ export default function HeroImages() {
                     </FormItem>
                   )}
                 />
-                
+
                 <FormField
                   control={form.control}
                   name="isActive"
@@ -626,7 +626,7 @@ export default function HeroImages() {
                   )}
                 />
               </div>
-              
+
               <DialogFooter>
                 <Button 
                   type="button" 
@@ -651,7 +651,7 @@ export default function HeroImages() {
           </Form>
         </DialogContent>
       </Dialog>
-      
+
       {/* Delete Hero Image Confirmation Dialog */}
       <AlertDialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
         <AlertDialogContent>
