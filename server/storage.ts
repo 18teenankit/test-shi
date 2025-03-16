@@ -84,16 +84,53 @@ export class MemStorage implements IStorage {
 
   constructor() {
     this.users = new Map();
-    this.categories = new Map(Object.entries(initialData.categories));
-    this.products = new Map(Object.entries(initialData.products));
+    
+    // Convert string-keyed objects to properly numbered Maps
+    this.categories = new Map();
+    if (initialData.categories) {
+      Object.entries(initialData.categories).forEach(([key, value]) => {
+        const id = Number(key);
+        if (!isNaN(id)) {
+          this.categories.set(id, value as Category);
+        }
+      });
+    }
+    
+    // Properly convert products
+    this.products = new Map();
+    if (initialData.products) {
+      Object.entries(initialData.products).forEach(([key, value]) => {
+        const product = value as Product;
+        // Handle invalid ids or the special -Infinity case
+        if (product.id === null || isNaN(Number(key))) {
+          product.id = 1; // Assign a default id of 1 if not valid
+        }
+        this.products.set(product.id, product);
+      });
+    }
+    
     this.productImages = new Map();
     this.heroImages = new Map();
     this.contactRequests = new Map();
     this.settings = new Map();
 
+    // Initialize IDs
     this.userCurrentId = 1;
-    this.categoryCurrentId = initialData.categories ? Math.max(...Array.from(this.categories.keys()).map(Number)) + 1 : 1;
-    this.productCurrentId = initialData.products ? Math.max(...Array.from(this.products.keys()).map(Number)) + 1 : 1;
+    
+    // Calculate the next available category ID
+    this.categoryCurrentId = 1;
+    if (this.categories.size > 0) {
+      const maxCategoryId = Math.max(...Array.from(this.categories.keys()));
+      this.categoryCurrentId = maxCategoryId + 1;
+    }
+    
+    // Calculate the next available product ID
+    this.productCurrentId = 1;
+    if (this.products.size > 0) {
+      const maxProductId = Math.max(...Array.from(this.products.keys()));
+      this.productCurrentId = maxProductId + 1;
+    }
+    
     this.productImageCurrentId = 1;
     this.heroImageCurrentId = 1;
     this.contactRequestCurrentId = 1;
@@ -286,12 +323,13 @@ export class MemStorage implements IStorage {
   }
 
   async createProduct(product: InsertProduct): Promise<Product> {
+    const newId = this.productCurrentId++;
     const newProduct: Product = {
-      id: this.productCurrentId++,
+      id: newId,
       ...product,
       createdAt: new Date()
     };
-    this.products.set(newProduct.id, newProduct);
+    this.products.set(newId, newProduct);
     this.saveData();
     return newProduct;
   }

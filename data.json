@@ -1,11 +1,39 @@
 {
   "products": {
-    "-Infinity": {
-      "id": null,
-      "name": "HTML",
-      "description": "",
+    "1": {
+      "id": 1,
+      "name": "Toluene",
+      "description": "High-purity industrial toluene for various applications",
       "categoryId": 1,
       "createdAt": "2025-03-16T20:55:14.860Z"
+    },
+    "2": {
+      "id": 2,
+      "name": "Isopropyl Alcohol",
+      "description": "99.9% pure isopropyl alcohol for industrial cleaning",
+      "categoryId": 2,
+      "createdAt": "2025-03-16T21:20:10.123Z"
+    },
+    "3": {
+      "id": 3,
+      "name": "Sulfuric Acid",
+      "description": "Industrial grade sulfuric acid for chemical processing",
+      "categoryId": 3,
+      "createdAt": "2025-03-16T21:20:45.456Z"
+    },
+    "4": {
+      "id": 4,
+      "name": "Sodium Bromide",
+      "description": "High-quality sodium bromide for industrial applications",
+      "categoryId": 4,
+      "createdAt": "2025-03-16T21:21:05.789Z"
+    },
+    "5": {
+      "id": 5,
+      "name": "Sodium Sulphate",
+      "description": "Anhydrous sodium sulphate for detergent manufacturing",
+      "categoryId": 5,
+      "createdAt": "2025-03-16T21:21:30.123Z"
     }
   },
   "categories": {

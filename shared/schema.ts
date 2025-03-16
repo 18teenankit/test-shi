@@ -29,9 +29,6 @@ export const products = pgTable("products", {
   name: text("name").notNull(),
   description: text("description"),
   categoryId: integer("category_id").references(() => categories.id),
-  specifications: text("specifications"),
-  inStock: boolean("in_stock").default(true),
-  discount: integer("discount").default(0),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

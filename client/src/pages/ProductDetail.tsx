@@ -2,10 +2,8 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useRoute } from "wouter";
 import { Layout } from "@/components/layouts/Layout";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Carousel } from "@/components/ui/carousel-custom";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Link } from "wouter";
 import { ChevronRight } from "lucide-react";
@@ -61,19 +59,16 @@ export default function ProductDetail() {
     return (
       <Layout>
         <div className="container mx-auto px-4 py-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden">
-              <Skeleton className="w-full aspect-square" />
+          <Skeleton className="h-4 w-1/2 mb-6" />
+          <div className="bg-white dark:bg-card rounded-lg shadow p-6">
+            <Skeleton className="h-8 w-3/4 mb-4" />
+            <Skeleton className="h-6 w-1/2 mb-2" />
+            <div className="space-y-2 mt-6">
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-3/4" />
             </div>
-            
-            <div className="space-y-4">
-              <Skeleton className="h-8 w-3/4" />
-              <Skeleton className="h-6 w-1/4" />
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-3/4" />
-              </div>
+            <div className="mt-4">
               <Skeleton className="h-10 w-1/3" />
             </div>
           </div>
@@ -104,25 +99,6 @@ export default function ProductDetail() {
     );
   }
   
-  // Prepare carousel items from product images
-  const carouselItems = product.images && product.images.length > 0
-    ? product.images.map((image: any) => (
-        <div className="w-full aspect-square bg-gray-100 dark:bg-gray-800 relative overflow-hidden">
-          <img
-            src={image.imageUrl}
-            alt={product.name}
-            className="absolute inset-0 w-full h-full object-contain"
-          />
-        </div>
-      ))
-    : [
-        <div className="w-full aspect-square bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-          <span className="text-gray-500 dark:text-gray-400">
-            {language === "en" ? "No image available" : "कोई छवि उपलब्ध नहीं है"}
-          </span>
-        </div>
-      ];
-  
   return (
     <Layout>
       <div className="container mx-auto px-4 py-8">
@@ -142,71 +118,40 @@ export default function ProductDetail() {
           <span className="text-gray-700 dark:text-gray-300">{product.name}</span>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="relative rounded-lg overflow-hidden shadow-md">
-            <Carousel items={carouselItems} showDots={carouselItems.length > 1} />
+        <div className="bg-white dark:bg-card rounded-lg shadow p-6">
+          <h1 className="text-3xl font-bold mb-4">{product.name}</h1>
             
-            {product.discount > 0 && (
-              <div className="absolute top-4 left-4 z-10">
-                <Badge variant="secondary" className="bg-amber-500 text-white">
-                  {product.discount}% {currentContent.discount}
-                </Badge>
-              </div>
-            )}
-          </div>
-          
-          <div>
-            <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
-            
+          {product.category && (
             <div className="mb-4">
-              <Badge variant={product.inStock ? "default" : "destructive"} className={product.inStock ? "bg-emerald-500" : ""}>
-                {product.inStock ? currentContent.inStock : currentContent.outOfStock}
-              </Badge>
-            </div>
-            
-            {product.category && (
-              <div className="mb-4">
-                <span className="text-gray-600 dark:text-gray-300">{currentContent.category}: </span>
-                <Link href={`/category/${product.category.id}`}>
-                  <a className="text-primary hover:underline">{product.category.name}</a>
-                </Link>
-              </div>
-            )}
-            
-            <Tabs defaultValue="description" className="mt-6">
-              <TabsList className="mb-4">
-                <TabsTrigger value="description">{currentContent.description}</TabsTrigger>
-                {product.specifications && (
-                  <TabsTrigger value="specifications">{currentContent.specifications}</TabsTrigger>
-                )}
-              </TabsList>
-              
-              <TabsContent value="description" className="text-gray-700 dark:text-gray-300">
-                {product.description || (
-                  <p className="text-gray-500 italic">
-                    {language === "en" 
-                      ? "No description available" 
-                      : "कोई विवरण उपलब्ध नहीं है"}
-                  </p>
-                )}
-              </TabsContent>
-              
-              {product.specifications && (
-                <TabsContent value="specifications" className="text-gray-700 dark:text-gray-300">
-                  <div className="whitespace-pre-line">
-                    {product.specifications}
-                  </div>
-                </TabsContent>
-              )}
-            </Tabs>
-            
-            <div className="mt-8">
-              <Link href="/contact">
-                <Button className="bg-primary hover:bg-primary/90 text-white">
-                  {currentContent.contactUs}
-                </Button>
+              <span className="text-gray-600 dark:text-gray-300">{currentContent.category}: </span>
+              <Link href={`/category/${product.category.id}`}>
+                <a className="text-primary hover:underline">{product.category.name}</a>
               </Link>
             </div>
+          )}
+          
+          <Tabs defaultValue="description" className="mt-6">
+            <TabsList className="mb-4">
+              <TabsTrigger value="description">{currentContent.description}</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="description" className="text-gray-700 dark:text-gray-300">
+              {product.description || (
+                <p className="text-gray-500 italic">
+                  {language === "en" 
+                    ? "No description available" 
+                    : "कोई विवरण उपलब्ध नहीं है"}
+                </p>
+              )}
+            </TabsContent>
+          </Tabs>
+          
+          <div className="mt-8">
+            <Link href="/contact">
+              <Button className="bg-primary hover:bg-primary/90 text-white">
+                {currentContent.contactUs}
+              </Button>
+            </Link>
           </div>
         </div>
       </div>

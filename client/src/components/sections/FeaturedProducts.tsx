@@ -61,30 +61,39 @@ export function FeaturedProducts({ language = "en" }: FeaturedProductsProps) {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="max-w-3xl mx-auto">
           {isLoading ? (
-            renderSkeletons()
+            <div className="bg-white dark:bg-card rounded-lg shadow divide-y">
+              {Array(4).fill(0).map((_, i) => (
+                <div key={i} className="p-4">
+                  <Skeleton className="h-6 w-3/4 mb-2" />
+                  <Skeleton className="h-4 w-full" />
+                </div>
+              ))}
+            </div>
           ) : error ? (
-            <div className="col-span-full text-center py-8 text-gray-500">
+            <div className="text-center py-8 text-gray-500 bg-white dark:bg-card rounded-lg shadow">
               {currentContent.errorText}
             </div>
           ) : products?.length === 0 ? (
-            <div className="col-span-full text-center py-8 text-gray-500">
+            <div className="text-center py-8 text-gray-500 bg-white dark:bg-card rounded-lg shadow">
               {currentContent.emptyText}
             </div>
           ) : (
-            products?.slice(0, 4).map((product: any) => (
-              <ProductCard
-                key={product.id}
-                id={product.id}
-                name={product.name}
-                description={product.description || ""}
-                imageUrl={product.mainImage || undefined}
-                inStock={product.inStock}
-                discount={product.discount}
-                language={language}
-              />
-            ))
+            <div className="bg-white dark:bg-card rounded-lg shadow divide-y">
+              {products?.slice(0, 4).map((product: any) => (
+                <div key={product.id} className="p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                  <div onClick={() => window.location.href = `/product/${product.id}`} className="cursor-pointer">
+                    <h3 className="text-lg font-medium hover:text-primary mb-1">{product.name}</h3>
+                    {product.description && (
+                      <p className="text-gray-600 dark:text-gray-300 text-sm mb-1 line-clamp-1">
+                        {product.description}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
         </div>
         

@@ -166,20 +166,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         products = await storage.getProducts();
       }
 
-      // Enhance products with category info and main image
+      // Enhance products with category info only - no images
       const enhancedProducts = await Promise.all(
         products.map(async (product) => {
           const category = product.categoryId 
             ? await storage.getCategory(product.categoryId) 
             : undefined;
 
-          const images = await storage.getProductImages(product.id);
-          const mainImage = images.find(img => img.isMain) || images[0];
-
           return {
             ...product,
             category: category ? { id: category.id, name: category.name } : null,
-            mainImage: mainImage ? mainImage.imageUrl : null
+            mainImage: null // Always set to null to maintain API structure but remove image functionality
           };
         })
       );
@@ -201,12 +198,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ? await storage.getCategory(product.categoryId) 
         : undefined;
 
-      const images = await storage.getProductImages(product.id);
-
+      // No images needed for the simplified version
       res.json({
         ...product,
         category: category ? { id: category.id, name: category.name } : null,
-        images: images
+        images: [] // Always return an empty array to maintain API structure without images
       });
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch product" });

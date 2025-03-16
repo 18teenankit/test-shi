@@ -120,26 +120,31 @@ export default function ProductCategory() {
           </div>
           
           {isLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {renderSkeletons()}
+            <div className="bg-white dark:bg-card rounded-lg shadow">
+              {Array(5).fill(0).map((_, i) => (
+                <div key={i} className="p-4 border-b">
+                  <Skeleton className="h-6 w-1/3 mb-2" />
+                  <Skeleton className="h-4 w-full" />
+                </div>
+              ))}
             </div>
           ) : sortedProducts.length === 0 ? (
             <div className="text-center py-12 bg-white dark:bg-card rounded-lg shadow">
               <p className="text-gray-500 dark:text-gray-400">{currentContent.noProductsFound}</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="bg-white dark:bg-card rounded-lg shadow divide-y">
               {sortedProducts.map((product: any) => (
-                <ProductCard
-                  key={product.id}
-                  id={product.id}
-                  name={product.name}
-                  description={product.description || ""}
-                  imageUrl={product.mainImage}
-                  inStock={product.inStock}
-                  discount={product.discount}
-                  language={language}
-                />
+                <div key={product.id} className="p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                  <div onClick={() => window.location.href = `/product/${product.id}`} className="cursor-pointer">
+                    <h3 className="text-lg font-medium hover:text-primary mb-1">{product.name}</h3>
+                    {product.description && (
+                      <p className="text-gray-600 dark:text-gray-300 text-sm mb-1 line-clamp-1">
+                        {product.description}
+                      </p>
+                    )}
+                  </div>
+                </div>
               ))}
             </div>
           )}
