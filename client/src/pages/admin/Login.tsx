@@ -124,13 +124,7 @@ export default function Login() {
           </Form>
         </CardContent>
         
-        <CardFooter className="border-t pt-4 flex flex-col space-y-2">
-          <div className="text-sm text-center text-gray-500 dark:text-gray-400">
-            <p>Admin credentials for testing:</p>
-            <p>Username: Sunilgiri@admin | Password: Girisunil@4444</p>
-            <p>Username: Ankit@admin | Password: Ankit@968511</p>
-          </div>
-        </CardFooter>
+        {/* Card footer removed */}
       </Card>
     </div>
   );

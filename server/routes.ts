@@ -274,6 +274,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         req.logIn(user, (err) => {
           if (err) return next(err);
 
+          // Set session cookie to expire in 30 days
+          if (req.session) {
+            req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000; // 30 days
+          }
+
+          // Reset login attempts
+          if (loginAttempts.has(loginData.username)) {
+            loginAttempts.delete(loginData.username);
+          }
+
           // Remove sensitive info
           const safeUser = {
             id: user.id,
@@ -288,13 +298,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       handleZodError(error, res);
     }
   });
-
+  
+  // Logout endpoint
   app.post("/api/logout", (req, res) => {
     req.logout((err) => {
       if (err) {
         return res.status(500).json({ message: "Failed to logout" });
       }
-      res.json({ message: "Logged out successfully" });
+      if (req.session) {
+        req.session.destroy((err) => {
+          if (err) {
+            return res.status(500).json({ message: "Failed to destroy session" });
+          }
+          res.clearCookie("connect.sid");
+          return res.json({ message: "Logged out successfully" });
+        });
+      } else {
+        res.clearCookie("connect.sid");
+        return res.json({ message: "Logged out successfully" });
+      }
     });
   });
 

@@ -43,7 +43,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         
         if (response.ok) {
           const data = await response.json();
-          setUser(data.user);
+          if (data && data.user) {
+            setUser(data.user);
+          }
         }
       } catch (error) {
         console.error("Auth check failed:", error);
@@ -73,8 +75,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   // Logout function
-  const logout = () => {
-    setUser(null);
+  const logout = async () => {
+    try {
+      await apiRequest("POST", "/api/logout", {});
+      setUser(null);
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   };
 
   // Computed properties

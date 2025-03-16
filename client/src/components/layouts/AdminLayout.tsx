@@ -54,8 +54,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   
   const handleLogout = async () => {
     try {
-      await apiRequest("POST", "/api/logout", {});
-      logout();
+      await logout();
       navigate("/admin/login");
     } catch (error) {
       console.error("Logout failed:", error);
