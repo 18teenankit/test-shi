@@ -78,7 +78,11 @@ export const settings = pgTable("settings", {
 // Schema Validations
 export const insertUserSchema = createInsertSchema(users).omit({ id: true, createdAt: true });
 export const insertCategorySchema = createInsertSchema(categories).omit({ id: true, createdAt: true });
-export const insertProductSchema = createInsertSchema(products).omit({ id: true, createdAt: true });
+export const insertProductSchema = z.object({
+  name: z.string().min(1),
+  description: z.string(),
+  categoryId: z.number(),
+});
 export const insertProductImageSchema = createInsertSchema(productImages).omit({ id: true });
 export const insertHeroImageSchema = createInsertSchema(heroImages).omit({ id: true });
 export const insertContactRequestSchema = createInsertSchema(contactRequests).omit({ id: true, createdAt: true, status: true });

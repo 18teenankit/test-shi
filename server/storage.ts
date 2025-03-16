@@ -6,6 +6,16 @@ import {
   type Setting, type InsertSetting
 } from "@shared/schema";
 import bcrypt from "bcrypt";
+import fs from 'fs';
+
+const DATA_FILE = './data.json';
+
+// Load initial data
+let initialData = { products: {}, categories: {} };
+if (fs.existsSync(DATA_FILE)) {
+  initialData = JSON.parse(fs.readFileSync(DATA_FILE, 'utf-8'));
+}
+
 
 // Interface for storage operations
 export interface IStorage {
@@ -14,14 +24,14 @@ export interface IStorage {
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   validateUser(username: string, password: string): Promise<User | null>;
-  
+
   // Category methods
   getCategories(): Promise<Category[]>;
   getCategory(id: number): Promise<Category | undefined>;
   createCategory(category: InsertCategory): Promise<Category>;
   updateCategory(id: number, category: Partial<InsertCategory>): Promise<Category | undefined>;
   deleteCategory(id: number): Promise<boolean>;
-  
+
   // Product methods
   getProducts(): Promise<Product[]>;
   getProductsByCategory(categoryId: number): Promise<Product[]>;
@@ -29,26 +39,26 @@ export interface IStorage {
   createProduct(product: InsertProduct): Promise<Product>;
   updateProduct(id: number, product: Partial<InsertProduct>): Promise<Product | undefined>;
   deleteProduct(id: number): Promise<boolean>;
-  
+
   // Product Image methods
   getProductImages(productId: number): Promise<ProductImage[]>;
   createProductImage(image: InsertProductImage): Promise<ProductImage>;
   updateProductImage(id: number, image: Partial<InsertProductImage>): Promise<ProductImage | undefined>;
   deleteProductImage(id: number): Promise<boolean>;
-  
+
   // Hero Image methods
   getHeroImages(): Promise<HeroImage[]>;
   createHeroImage(image: InsertHeroImage): Promise<HeroImage>;
   updateHeroImage(id: number, image: Partial<InsertHeroImage>): Promise<HeroImage | undefined>;
   deleteHeroImage(id: number): Promise<boolean>;
-  
+
   // Contact Request methods
   getContactRequests(): Promise<ContactRequest[]>;
   getContactRequest(id: number): Promise<ContactRequest | undefined>;
   createContactRequest(request: InsertContactRequest): Promise<ContactRequest>;
   updateContactRequestStatus(id: number, status: string): Promise<ContactRequest | undefined>;
   deleteContactRequest(id: number): Promise<boolean>;
-  
+
   // Settings methods
   getSetting(key: string): Promise<Setting | undefined>;
   getAllSettings(): Promise<Setting[]>;
@@ -63,7 +73,7 @@ export class MemStorage implements IStorage {
   private heroImages: Map<number, HeroImage>;
   private contactRequests: Map<number, ContactRequest>;
   private settings: Map<string, Setting>;
-  
+
   private userCurrentId: number;
   private categoryCurrentId: number;
   private productCurrentId: number;
@@ -71,28 +81,28 @@ export class MemStorage implements IStorage {
   private heroImageCurrentId: number;
   private contactRequestCurrentId: number;
   private settingCurrentId: number;
-  
+
   constructor() {
     this.users = new Map();
-    this.categories = new Map();
-    this.products = new Map();
+    this.categories = new Map(Object.entries(initialData.categories));
+    this.products = new Map(Object.entries(initialData.products));
     this.productImages = new Map();
     this.heroImages = new Map();
     this.contactRequests = new Map();
     this.settings = new Map();
-    
+
     this.userCurrentId = 1;
-    this.categoryCurrentId = 1;
-    this.productCurrentId = 1;
+    this.categoryCurrentId = initialData.categories ? Math.max(...Array.from(this.categories.keys()).map(Number)) + 1 : 1;
+    this.productCurrentId = initialData.products ? Math.max(...Array.from(this.products.keys()).map(Number)) + 1 : 1;
     this.productImageCurrentId = 1;
     this.heroImageCurrentId = 1;
     this.contactRequestCurrentId = 1;
     this.settingCurrentId = 1;
-    
+
     // Initialize with default admin users
     this.initializeDefaultData();
   }
-  
+
   private async initializeDefaultData() {
     // Create default admin users
     const hashedPassword1 = await bcrypt.hash("Girisunil@4444", 10);
@@ -103,7 +113,7 @@ export class MemStorage implements IStorage {
       role: "super_admin",
       createdAt: new Date()
     });
-    
+
     const hashedPassword2 = await bcrypt.hash("Ankit@968511", 10);
     this.users.set(this.userCurrentId, {
       id: this.userCurrentId++,
@@ -112,16 +122,16 @@ export class MemStorage implements IStorage {
       role: "manager",
       createdAt: new Date()
     });
-    
+
     // Empty categories - to be added from admin panel
     const categories = [];
-    
+
     // Empty products - to be added from admin panel
     const products = [];
-    
+
     // Empty product images - to be added from admin panel
     const productImages = [];
-    
+
     // Hero images for chemicals company
     const heroImages = [
       { 
@@ -152,7 +162,7 @@ export class MemStorage implements IStorage {
         isActive: true
       }
     ];
-    
+
     heroImages.forEach(image => {
       this.heroImages.set(this.heroImageCurrentId, {
         id: this.heroImageCurrentId,
@@ -166,7 +176,7 @@ export class MemStorage implements IStorage {
       });
       this.heroImageCurrentId++;
     });
-    
+
     // Default settings
     const defaultSettings = [
       { key: "company_name", value: "Shivanshi Enterprises" },
@@ -180,7 +190,7 @@ export class MemStorage implements IStorage {
       { key: "social_whatsapp_link", value: "https://wa.me/919418974444" },
       { key: "google_maps_url", value: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3602.9321413865613!2d81.7956!3d25.3503!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjXCsDIxJzAxLjAiTiA4McKwNDcnNDQuMiJF!5e0!3m2!1sen!2sin!4v1615473046844!5m2!1sen!2sin" }
     ];
-    
+
     defaultSettings.forEach(setting => {
       this.settings.set(setting.key, {
         id: this.settingCurrentId++,
@@ -189,18 +199,18 @@ export class MemStorage implements IStorage {
       });
     });
   }
-  
+
   // User methods
   async getUser(id: number): Promise<User | undefined> {
     return this.users.get(id);
   }
-  
+
   async getUserByUsername(username: string): Promise<User | undefined> {
     return Array.from(this.users.values()).find(
       (user) => user.username === username,
     );
   }
-  
+
   async createUser(insertUser: InsertUser): Promise<User> {
     const hashedPassword = await bcrypt.hash(insertUser.password, 10);
     const user: User = {
@@ -210,28 +220,29 @@ export class MemStorage implements IStorage {
       createdAt: new Date()
     };
     this.users.set(user.id, user);
+    this.saveData();
     return user;
   }
-  
+
   async validateUser(username: string, password: string): Promise<User | null> {
     const user = await this.getUserByUsername(username);
     if (!user) return null;
-    
+
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) return null;
-    
+
     return user;
   }
-  
+
   // Category methods
   async getCategories(): Promise<Category[]> {
     return Array.from(this.categories.values());
   }
-  
+
   async getCategory(id: number): Promise<Category | undefined> {
     return this.categories.get(id);
   }
-  
+
   async createCategory(category: InsertCategory): Promise<Category> {
     const newCategory: Category = {
       id: this.categoryCurrentId++,
@@ -239,37 +250,41 @@ export class MemStorage implements IStorage {
       createdAt: new Date()
     };
     this.categories.set(newCategory.id, newCategory);
+    this.saveData();
     return newCategory;
   }
-  
+
   async updateCategory(id: number, categoryUpdate: Partial<InsertCategory>): Promise<Category | undefined> {
     const category = this.categories.get(id);
     if (!category) return undefined;
-    
+
     const updatedCategory = { ...category, ...categoryUpdate };
     this.categories.set(id, updatedCategory);
+    this.saveData();
     return updatedCategory;
   }
-  
+
   async deleteCategory(id: number): Promise<boolean> {
-    return this.categories.delete(id);
+    const result = this.categories.delete(id);
+    this.saveData();
+    return result;
   }
-  
+
   // Product methods
   async getProducts(): Promise<Product[]> {
     return Array.from(this.products.values());
   }
-  
+
   async getProductsByCategory(categoryId: number): Promise<Product[]> {
     return Array.from(this.products.values()).filter(
       (product) => product.categoryId === categoryId,
     );
   }
-  
+
   async getProduct(id: number): Promise<Product | undefined> {
     return this.products.get(id);
   }
-  
+
   async createProduct(product: InsertProduct): Promise<Product> {
     const newProduct: Product = {
       id: this.productCurrentId++,
@@ -277,89 +292,101 @@ export class MemStorage implements IStorage {
       createdAt: new Date()
     };
     this.products.set(newProduct.id, newProduct);
+    this.saveData();
     return newProduct;
   }
-  
+
   async updateProduct(id: number, productUpdate: Partial<InsertProduct>): Promise<Product | undefined> {
     const product = this.products.get(id);
     if (!product) return undefined;
-    
+
     const updatedProduct = { ...product, ...productUpdate };
     this.products.set(id, updatedProduct);
+    this.saveData();
     return updatedProduct;
   }
-  
+
   async deleteProduct(id: number): Promise<boolean> {
-    return this.products.delete(id);
+    const result = this.products.delete(id);
+    this.saveData();
+    return result;
   }
-  
+
   // Product Image methods
   async getProductImages(productId: number): Promise<ProductImage[]> {
     return Array.from(this.productImages.values()).filter(
       (image) => image.productId === productId,
     );
   }
-  
+
   async createProductImage(image: InsertProductImage): Promise<ProductImage> {
     const newImage: ProductImage = {
       id: this.productImageCurrentId++,
       ...image
     };
     this.productImages.set(newImage.id, newImage);
+    this.saveData();
     return newImage;
   }
-  
+
   async updateProductImage(id: number, imageUpdate: Partial<InsertProductImage>): Promise<ProductImage | undefined> {
     const image = this.productImages.get(id);
     if (!image) return undefined;
-    
+
     const updatedImage = { ...image, ...imageUpdate };
     this.productImages.set(id, updatedImage);
+    this.saveData();
     return updatedImage;
   }
-  
+
   async deleteProductImage(id: number): Promise<boolean> {
-    return this.productImages.delete(id);
+    const result = this.productImages.delete(id);
+    this.saveData();
+    return result;
   }
-  
+
   // Hero Image methods
   async getHeroImages(): Promise<HeroImage[]> {
     return Array.from(this.heroImages.values())
       .filter(image => image.isActive)
       .sort((a, b) => a.order - b.order);
   }
-  
+
   async createHeroImage(image: InsertHeroImage): Promise<HeroImage> {
     const newImage: HeroImage = {
       id: this.heroImageCurrentId++,
       ...image
     };
     this.heroImages.set(newImage.id, newImage);
+    this.saveData();
     return newImage;
   }
-  
+
   async updateHeroImage(id: number, imageUpdate: Partial<InsertHeroImage>): Promise<HeroImage | undefined> {
     const image = this.heroImages.get(id);
     if (!image) return undefined;
-    
+
     const updatedImage = { ...image, ...imageUpdate };
     this.heroImages.set(id, updatedImage);
+    this.saveData();
     return updatedImage;
   }
-  
+
   async deleteHeroImage(id: number): Promise<boolean> {
-    return this.heroImages.delete(id);
+    const result = this.heroImages.delete(id);
+    this.saveData();
+    return result;
   }
-  
+
   // Contact Request methods
   async getContactRequests(): Promise<ContactRequest[]> {
     return Array.from(this.contactRequests.values());
   }
-  
+
   async getContactRequest(id: number): Promise<ContactRequest | undefined> {
     return this.contactRequests.get(id);
   }
-  
+
   async createContactRequest(request: InsertContactRequest): Promise<ContactRequest> {
     const newRequest: ContactRequest = {
       id: this.contactRequestCurrentId++,
@@ -368,37 +395,42 @@ export class MemStorage implements IStorage {
       createdAt: new Date()
     };
     this.contactRequests.set(newRequest.id, newRequest);
+    this.saveData();
     return newRequest;
   }
-  
+
   async updateContactRequestStatus(id: number, status: string): Promise<ContactRequest | undefined> {
     const request = this.contactRequests.get(id);
     if (!request) return undefined;
-    
+
     const updatedRequest = { ...request, status };
     this.contactRequests.set(id, updatedRequest);
+    this.saveData();
     return updatedRequest;
   }
-  
+
   async deleteContactRequest(id: number): Promise<boolean> {
-    return this.contactRequests.delete(id);
+    const result = this.contactRequests.delete(id);
+    this.saveData();
+    return result;
   }
-  
+
   // Settings methods
   async getSetting(key: string): Promise<Setting | undefined> {
     return this.settings.get(key);
   }
-  
+
   async getAllSettings(): Promise<Setting[]> {
     return Array.from(this.settings.values());
   }
-  
+
   async upsertSetting(setting: InsertSetting): Promise<Setting> {
     const existingSetting = this.settings.get(setting.key);
-    
+
     if (existingSetting) {
       const updatedSetting = { ...existingSetting, value: setting.value };
       this.settings.set(setting.key, updatedSetting);
+      this.saveData();
       return updatedSetting;
     } else {
       const newSetting: Setting = {
@@ -406,8 +438,17 @@ export class MemStorage implements IStorage {
         ...setting
       };
       this.settings.set(setting.key, newSetting);
+      this.saveData();
       return newSetting;
     }
+  }
+
+  private saveData() {
+    const data = {
+      products: Object.fromEntries(this.products),
+      categories: Object.fromEntries(this.categories),
+    };
+    fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
   }
 }
 
