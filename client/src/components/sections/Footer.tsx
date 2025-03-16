@@ -139,18 +139,14 @@ export function Footer({ language = "en" }: FooterProps) {
             <ul className="space-y-2">
               {categories?.map((category: any) => (
                 <li key={category.id}>
-                  <Link href={`/category/${category.id}`}>
-                    <a className="text-gray-300 hover:text-white transition-colors">
-                      {category.name}
-                    </a>
+                  <Link href={`/category/${category.id}`} className="text-gray-300 hover:text-white transition-colors">
+                    {category.name}
                   </Link>
                 </li>
               ))}
               <li>
-                <Link href="/products">
-                  <a className="text-gray-300 hover:text-white transition-colors">
-                    {language === "en" ? "New Arrivals" : "नए आगमन"}
-                  </a>
+                <Link href="/products" className="text-gray-300 hover:text-white transition-colors">
+                  {language === "en" ? "New Arrivals" : "नए आगमन"}
                 </Link>
               </li>
             </ul>
@@ -160,38 +156,28 @@ export function Footer({ language = "en" }: FooterProps) {
             <h3 className="text-xl font-semibold mb-4">{currentContent.quickLinks}</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/">
-                  <a className="text-gray-300 hover:text-white transition-colors">
-                    {currentContent.home}
-                  </a>
+                <Link href="/" className="text-gray-300 hover:text-white transition-colors">
+                  {currentContent.home}
                 </Link>
               </li>
               <li>
-                <Link href="/about">
-                  <a className="text-gray-300 hover:text-white transition-colors">
-                    {currentContent.about}
-                  </a>
+                <Link href="/about" className="text-gray-300 hover:text-white transition-colors">
+                  {currentContent.about}
                 </Link>
               </li>
               <li>
-                <Link href="/products">
-                  <a className="text-gray-300 hover:text-white transition-colors">
-                    {language === "en" ? "Products" : "उत्पाद"}
-                  </a>
+                <Link href="/products" className="text-gray-300 hover:text-white transition-colors">
+                  {language === "en" ? "Products" : "उत्पाद"}
                 </Link>
               </li>
               <li>
-                <Link href="/contact">
-                  <a className="text-gray-300 hover:text-white transition-colors">
-                    {currentContent.contact}
-                  </a>
+                <Link href="/contact" className="text-gray-300 hover:text-white transition-colors">
+                  {currentContent.contact}
                 </Link>
               </li>
               <li>
-                <Link href="/terms">
-                  <a className="text-gray-300 hover:text-white transition-colors">
-                    {currentContent.terms}
-                  </a>
+                <Link href="/terms" className="text-gray-300 hover:text-white transition-colors">
+                  {currentContent.terms}
                 </Link>
               </li>
             </ul>
@@ -228,20 +214,14 @@ export function Footer({ language = "en" }: FooterProps) {
               © {new Date().getFullYear()} {settings?.company_name || "Shivanshi Enterprises"}. {currentContent.allRights}
             </p>
             <div className="flex space-x-4">
-              <Link href="/privacy">
-                <a className="text-gray-400 text-sm hover:text-white transition-colors">
-                  {currentContent.privacy}
-                </a>
+              <Link href="/privacy" className="text-gray-400 text-sm hover:text-white transition-colors">
+                {currentContent.privacy}
               </Link>
-              <Link href="/terms">
-                <a className="text-gray-400 text-sm hover:text-white transition-colors">
-                  {currentContent.termsOfService}
-                </a>
+              <Link href="/terms" className="text-gray-400 text-sm hover:text-white transition-colors">
+                {currentContent.termsOfService}
               </Link>
-              <Link href="/sitemap">
-                <a className="text-gray-400 text-sm hover:text-white transition-colors">
-                  {currentContent.sitemap}
-                </a>
+              <Link href="/sitemap" className="text-gray-400 text-sm hover:text-white transition-colors">
+                {currentContent.sitemap}
               </Link>
             </div>
           </div>

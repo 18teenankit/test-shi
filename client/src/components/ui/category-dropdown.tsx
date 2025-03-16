@@ -39,10 +39,8 @@ export function CategoryDropdown({ isMobile = false, language = "en" }: Category
           ) : (
             <>
               {categories?.map((category: any) => (
-                <Link key={category.id} href={`/category/${category.id}`}>
-                  <a className="block py-2 hover:text-primary dark:hover:text-primary transition-colors">
-                    {category.name}
-                  </a>
+                <Link key={category.id} href={`/category/${category.id}`} className="block py-2 hover:text-primary dark:hover:text-primary transition-colors">
+                  {category.name}
                 </Link>
               ))}
             </>
@@ -64,10 +62,8 @@ export function CategoryDropdown({ isMobile = false, language = "en" }: Category
         ) : (
           <>
             {categories?.map((category: any) => (
-              <Link key={category.id} href={`/category/${category.id}`}>
-                <a className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                  {category.name}
-                </a>
+              <Link key={category.id} href={`/category/${category.id}`} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                {category.name}
               </Link>
             ))}
           </>

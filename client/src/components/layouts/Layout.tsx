@@ -46,36 +46,28 @@ export function Layout({ children }: LayoutProps) {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between py-4">
             {/* Logo */}
-            <Link href="/">
-              <a className="flex items-center space-x-2">
-                <Logo />
-                <span className="text-xl font-bold text-primary dark:text-primary">
-                  {settings?.company_name || "Shivanshi Enterprises"}
-                </span>
-              </a>
+            <Link href="/" className="flex items-center space-x-2">
+              <Logo />
+              <span className="text-xl font-bold text-primary dark:text-primary">
+                {settings?.company_name || "Shivanshi Enterprises"}
+              </span>
             </Link>
             
             {/* Desktop Navigation */}
             {!isMobile && (
               <nav className="flex space-x-8">
-                <Link href="/">
-                  <a className="font-medium hover:text-primary dark:hover:text-primary transition-colors">
-                    {language === "en" ? "Home" : "होम"}
-                  </a>
+                <Link href="/" className="font-medium hover:text-primary dark:hover:text-primary transition-colors">
+                  {language === "en" ? "Home" : "होम"}
                 </Link>
                 
                 <CategoryDropdown language={language} />
                 
-                <Link href="/about">
-                  <a className="font-medium hover:text-primary dark:hover:text-primary transition-colors">
-                    {language === "en" ? "About Us" : "हमारे बारे में"}
-                  </a>
+                <Link href="/about" className="font-medium hover:text-primary dark:hover:text-primary transition-colors">
+                  {language === "en" ? "About Us" : "हमारे बारे में"}
                 </Link>
                 
-                <Link href="/contact">
-                  <a className="font-medium hover:text-primary dark:hover:text-primary transition-colors">
-                    {language === "en" ? "Contact" : "संपर्क करें"}
-                  </a>
+                <Link href="/contact" className="font-medium hover:text-primary dark:hover:text-primary transition-colors">
+                  {language === "en" ? "Contact" : "संपर्क करें"}
                 </Link>
               </nav>
             )}
@@ -118,26 +110,20 @@ export function Layout({ children }: LayoutProps) {
         {isMobile && isMobileMenuOpen && (
           <div className="bg-white dark:bg-card border-t dark:border-border py-4">
             <div className="container mx-auto px-4 space-y-3">
-              <Link href="/">
-                <a className="block font-medium hover:text-primary dark:hover:text-primary py-2 transition-colors">
-                  {language === "en" ? "Home" : "होम"}
-                </a>
+              <Link href="/" className="block font-medium hover:text-primary dark:hover:text-primary py-2 transition-colors">
+                {language === "en" ? "Home" : "होम"}
               </Link>
               
               <div className="py-2">
                 <CategoryDropdown isMobile language={language} />
               </div>
               
-              <Link href="/about">
-                <a className="block font-medium hover:text-primary dark:hover:text-primary py-2 transition-colors">
-                  {language === "en" ? "About Us" : "हमारे बारे में"}
-                </a>
+              <Link href="/about" className="block font-medium hover:text-primary dark:hover:text-primary py-2 transition-colors">
+                {language === "en" ? "About Us" : "हमारे बारे में"}
               </Link>
               
-              <Link href="/contact">
-                <a className="block font-medium hover:text-primary dark:hover:text-primary py-2 transition-colors">
-                  {language === "en" ? "Contact" : "संपर्क करें"}
-                </a>
+              <Link href="/contact" className="block font-medium hover:text-primary dark:hover:text-primary py-2 transition-colors">
+                {language === "en" ? "Contact" : "संपर्क करें"}
               </Link>
             </div>
           </div>
