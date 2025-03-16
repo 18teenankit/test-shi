@@ -38,11 +38,6 @@ export function HeroSection({ language = "en" }: HeroSectionProps) {
                   : "पैन इंडिया केमिकल एंड कंपाउंड डीलर्स - 2010 से गुणवत्ता और विश्वसनीयता"}
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link href="/products">
-                  <a className="inline-block bg-white hover:bg-gray-100 text-primary font-medium px-6 py-3 rounded-lg transition-colors text-center">
-                    {language === "en" ? "Explore Products" : "उत्पाद देखें"}
-                  </a>
-                </Link>
                 <a 
                   href="https://wa.me/919418974444" 
                   target="_blank" 

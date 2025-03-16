@@ -50,10 +50,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 
-// Extend the product schema to match the database structure
-const extendedProductSchema = insertProductSchema.extend({
-  // Fields for specifications, inStock, and discount removed as requested
-});
+// Use the simplified product schema
+const extendedProductSchema = insertProductSchema;
 
 type ProductFormValues = z.infer<typeof extendedProductSchema>;
 
@@ -205,11 +203,10 @@ export default function Products() {
       return;
     }
     
-    // Parse categoryId to number
+    // No need to parse categoryId, the schema validation will handle it
     const formData = {
       ...data,
-      categoryId: Number(data.categoryId),
-      // discount field removed as requested
+      // Using data as is since the schema now uses z.coerce.number()
     };
 
     if (selectedProduct) {
@@ -300,57 +297,86 @@ export default function Products() {
                 )}
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Category</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Discount</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
+              <div className="overflow-x-auto -mx-4 sm:mx-0">
+                <div className="inline-block min-w-full align-middle">
+                  {/* Mobile View (Card-based layout) */}
+                  <div className="md:hidden space-y-4 px-4">
                     {filteredProducts.map((product: any) => (
-                      <TableRow key={product.id}>
-                        <TableCell className="font-medium">{product.name}</TableCell>
-                        <TableCell>{product.category?.name || "None"}</TableCell>
-                        <TableCell>
-                          <Badge variant={product.inStock ? "default" : "destructive"} className={product.inStock ? "bg-green-500" : ""}>
-                            {product.inStock ? "In Stock" : "Out of Stock"}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          {product.discount > 0 ? `${product.discount}%` : "None"}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="sm">
-                                <MoreHorizontal className="h-4 w-4" />
-                                <span className="sr-only">Actions</span>
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => handleEdit(product)}>
-                                <Edit className="h-4 w-4 mr-2" />
-                                Edit
-                              </DropdownMenuItem>
-                              <DropdownMenuItem 
-                                onClick={() => handleDelete(product)}
-                                className="text-red-600 dark:text-red-400"
-                              >
-                                <Trash2 className="h-4 w-4 mr-2" />
-                                Delete
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
+                      <div key={product.id} className="bg-card rounded-lg shadow-sm p-4 space-y-2">
+                        <div className="flex justify-between items-start">
+                          <h3 className="font-medium">{product.name}</h3>
+                          <div className="flex space-x-2">
+                            <Button 
+                              onClick={() => handleEdit(product)} 
+                              variant="ghost" 
+                              size="sm"
+                              className="h-8 w-8 p-0"
+                            >
+                              <Edit className="h-4 w-4" />
+                              <span className="sr-only">Edit</span>
+                            </Button>
+                            <Button 
+                              onClick={() => handleDelete(product)} 
+                              variant="ghost" 
+                              size="sm"
+                              className="h-8 w-8 p-0 text-red-600 dark:text-red-400"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                              <span className="sr-only">Delete</span>
+                            </Button>
+                          </div>
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          Category: {product.category?.name || "None"}
+                        </div>
+                      </div>
                     ))}
-                  </TableBody>
-                </Table>
+                  </div>
+                  
+                  {/* Desktop View (Table-based layout) */}
+                  <div className="hidden md:block">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Name</TableHead>
+                          <TableHead>Category</TableHead>
+                          <TableHead className="text-right">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {filteredProducts.map((product: any) => (
+                          <TableRow key={product.id}>
+                            <TableCell className="font-medium">{product.name}</TableCell>
+                            <TableCell>{product.category?.name || "None"}</TableCell>
+                            <TableCell className="text-right">
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="sm">
+                                    <MoreHorizontal className="h-4 w-4" />
+                                    <span className="sr-only">Actions</span>
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem onClick={() => handleEdit(product)}>
+                                    <Edit className="h-4 w-4 mr-2" />
+                                    Edit
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem 
+                                    onClick={() => handleDelete(product)}
+                                    className="text-red-600 dark:text-red-400"
+                                  >
+                                    <Trash2 className="h-4 w-4 mr-2" />
+                                    Delete
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </div>
               </div>
             )}
           </CardContent>
@@ -367,7 +393,7 @@ export default function Products() {
           }
         }
       }}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl w-[calc(100%-2rem)] p-4 sm:p-6">
           <DialogHeader>
             <DialogTitle>{selectedProduct ? "Edit Product" : "Add New Product"}</DialogTitle>
             <DialogDescription>
@@ -395,7 +421,7 @@ export default function Products() {
                           <SelectValue placeholder="Select a category" />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent>
+                      <SelectContent position="popper" className="w-full min-w-[200px]">
                         {categoriesLoading ? (
                           <div className="px-2 py-4 text-center text-sm">Loading categories...</div>
                         ) : categories.length === 0 ? (
@@ -442,7 +468,7 @@ export default function Products() {
                     <FormControl>
                       <Textarea 
                         placeholder="Enter product description" 
-                        className="min-h-24"
+                        className="min-h-20 sm:min-h-24"
                         {...field} 
                       />
                     </FormControl>
@@ -453,17 +479,19 @@ export default function Products() {
 
               {/* Form fields for specifications, inStock, and discount removed as requested */}
 
-              <DialogFooter>
+              <DialogFooter className="flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">
                 <Button 
                   type="button" 
                   variant="outline" 
                   onClick={() => setOpenDialog(false)}
+                  className="w-full sm:w-auto"
                 >
                   Cancel
                 </Button>
                 <Button 
                   type="submit"
                   disabled={createMutation.isPending || updateMutation.isPending}
+                  className="w-full sm:w-auto"
                 >
                   {createMutation.isPending || updateMutation.isPending
                     ? "Saving..."
@@ -480,7 +508,7 @@ export default function Products() {
 
       {/* Delete Product Confirmation Dialog */}
       <AlertDialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
-        <AlertDialogContent>
+        <AlertDialogContent className="max-w-md w-[calc(100%-2rem)]">
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
@@ -488,11 +516,11 @@ export default function Products() {
               "{selectedProduct?.name}" from the database.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogFooter className="flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">
+            <AlertDialogCancel className="w-full sm:w-auto">Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => deleteMutation.mutate(selectedProduct?.id)}
-              className="bg-red-600 hover:bg-red-700"
+              className="w-full sm:w-auto bg-red-600 hover:bg-red-700"
               disabled={deleteMutation.isPending}
             >
               {deleteMutation.isPending ? "Deleting..." : "Delete"}

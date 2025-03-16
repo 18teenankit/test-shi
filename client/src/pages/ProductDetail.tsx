@@ -16,8 +16,19 @@ export default function ProductDetail() {
   const productId = params?.id ? parseInt(params.id) : undefined;
   
   // Fetch product details
-  const { data: product, isLoading } = useQuery({
-    queryKey: [`/api/products/${productId}`],
+  const { data: product, isLoading, isError } = useQuery({
+    queryKey: ["/api/products", productId],
+    queryFn: async () => {
+      if (!productId) throw new Error("Product ID is required");
+      const response = await fetch(`/api/products/${productId}`);
+      if (!response.ok) {
+        if (response.status === 404) {
+          return null;
+        }
+        throw new Error("Failed to fetch product");
+      }
+      return response.json();
+    },
     enabled: !!productId,
   });
   

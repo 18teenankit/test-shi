@@ -159,14 +159,6 @@ export function HeroCarousel({
                 {slide.subtitle && (
                   <p className="text-xl text-white mb-8">{slide.subtitle}</p>
                 )}
-                {slide.buttonText && slide.buttonLink && (
-                  <a
-                    href={slide.buttonLink}
-                    className="inline-block bg-primary hover:bg-opacity-90 text-white font-medium px-6 py-3 rounded-lg transition-colors"
-                  >
-                    {slide.buttonText}
-                  </a>
-                )}
               </div>
             </div>
           </div>

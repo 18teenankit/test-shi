@@ -81,10 +81,7 @@ export const insertCategorySchema = createInsertSchema(categories).omit({ id: tr
 export const insertProductSchema = z.object({
   name: z.string().min(1),
   description: z.string(),
-  categoryId: z.number(),
-  specifications: z.string().optional(),
-  inStock: z.boolean().default(true),
-  discount: z.number().min(0).max(100).default(0),
+  categoryId: z.coerce.number(),
 });
 export const insertProductImageSchema = createInsertSchema(productImages).omit({ id: true });
 export const insertHeroImageSchema = createInsertSchema(heroImages).omit({ id: true });

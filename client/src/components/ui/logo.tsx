@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
 
 interface LogoProps {
   size?: "small" | "medium" | "large";
@@ -12,6 +13,17 @@ export function Logo({ size = "medium", className }: LogoProps) {
     large: "h-20",
   };
 
+  // Fetch company name from settings
+  const { data: settings = {} } = useQuery({
+    queryKey: ["/api/settings"],
+  });
+
+  const companyName = settings.company_name || "Shivanshi Enterprises";
+  const companyTagline = settings.company_tagline || "Chemicals & Compound Dealers";
+
+  // Get first letter for the logo
+  const firstLetter = companyName?.charAt(0) || "S";
+
   return (
     <div className={cn(dimensions[size], "relative", className)}>
       <svg
@@ -19,9 +31,9 @@ export function Logo({ size = "medium", className }: LogoProps) {
         xmlns="http://www.w3.org/2000/svg"
         className="h-full w-auto"
       >
-        {/* Shivanshi Enterprises Logo */}
+        {/* Dynamic Logo */}
         <g>
-          {/* S in dark blue */}
+          {/* First letter in dark blue */}
           <path
             d="M120 50 C 150 30, 200 20, 220 50 C 240 80, 220 110, 150 130 C 80 150, 60 180, 80 210 C 100 240, 150 250, 180 230"
             stroke="#002859"
@@ -51,7 +63,7 @@ export function Logo({ size = "medium", className }: LogoProps) {
             strokeLinejoin="round"
           />
           
-          {/* SHIVANSHI text */}
+          {/* Company name */}
           <text
             x="40"
             y="320"
@@ -60,10 +72,10 @@ export function Logo({ size = "medium", className }: LogoProps) {
             fontWeight="bold"
             fill="#002859"
           >
-            SHIVANSHI
+            {companyName.toUpperCase()}
           </text>
           
-          {/* ENTERPRISES text */}
+          {/* Tagline */}
           <text
             x="120"
             y="370"
@@ -72,7 +84,7 @@ export function Logo({ size = "medium", className }: LogoProps) {
             fontWeight="normal"
             fill="#002859"
           >
-            ENTERPRISES
+            {companyTagline.toUpperCase()}
           </text>
         </g>
       </svg>
