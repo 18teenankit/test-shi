@@ -18,7 +18,7 @@ export function Footer({ language = "en" }: FooterProps) {
   
   const content = {
     en: {
-      description: "Your trusted partner for industrial equipment and power tools since 2005.",
+      description: "Your trusted partner for high-quality chemicals and compounds across India. Quality, safety, and reliability since 2010.",
       products: "Products",
       quickLinks: "Quick Links",
       home: "Home",
@@ -32,7 +32,7 @@ export function Footer({ language = "en" }: FooterProps) {
       sitemap: "Sitemap"
     },
     hi: {
-      description: "2005 से औद्योगिक उपकरण और पावर टूल्स के लिए आपका विश्वसनीय साथी।",
+      description: "पूरे भारत में उच्च गुणवत्ता वाले रसायनों और यौगिकों के लिए आपका विश्वसनीय साथी। 2010 से गुणवत्ता, सुरक्षा और विश्वसनीयता।",
       products: "उत्पाद",
       quickLinks: "त्वरित लिंक",
       home: "होम",

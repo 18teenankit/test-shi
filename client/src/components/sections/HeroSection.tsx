@@ -34,14 +34,24 @@ export function HeroSection({ language = "en" }: HeroSectionProps) {
               </h1>
               <p className="text-xl text-white mb-8">
                 {language === "en"
-                  ? "Your trusted partner for industrial equipment and power tools."
-                  : "औद्योगिक उपकरण और पावर टूल्स के लिए आपका विश्वसनीय साथी।"}
+                  ? "PAN India Chemical & Compound Dealers - Quality & Reliability Since 2010"
+                  : "पैन इंडिया केमिकल एंड कंपाउंड डीलर्स - 2010 से गुणवत्ता और विश्वसनीयता"}
               </p>
-              <Link href="/products">
-                <a className="inline-block bg-white hover:bg-gray-100 text-primary font-medium px-6 py-3 rounded-lg transition-colors">
-                  {language === "en" ? "Explore Products" : "उत्पाद देखें"}
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Link href="/products">
+                  <a className="inline-block bg-white hover:bg-gray-100 text-primary font-medium px-6 py-3 rounded-lg transition-colors text-center">
+                    {language === "en" ? "Explore Products" : "उत्पाद देखें"}
+                  </a>
+                </Link>
+                <a 
+                  href="https://wa.me/919418974444" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-block bg-green-600 hover:bg-green-700 text-white font-medium px-6 py-3 rounded-lg transition-colors text-center"
+                >
+                  {language === "en" ? "Contact via WhatsApp" : "व्हाट्सएप पर संपर्क करें"}
                 </a>
-              </Link>
+              </div>
             </div>
           </div>
         </div>

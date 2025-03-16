@@ -1,4 +1,4 @@
-import { Medal, Headset, Truck } from "lucide-react";
+import { Truck, ShieldCheck, Beaker } from "lucide-react";
 
 interface CompanyIntroProps {
   language?: "en" | "hi";
@@ -8,43 +8,43 @@ export function CompanyIntro({ language = "en" }: CompanyIntroProps) {
   const content = {
     en: {
       title: "Welcome to Shivanshi Enterprises",
-      description: "We are a leading supplier of industrial equipment, electric motors, and power tools serving businesses across India. With a commitment to quality and customer satisfaction, we provide reliable solutions for all your industrial needs.",
+      description: "We are a trusted PAN India supplier of high-quality chemicals and compounds serving industries across India. With a commitment to quality and customer satisfaction, we provide reliable solutions for all your chemical and compound needs.",
       features: [
         {
-          icon: <Medal className="text-2xl text-primary" />,
-          title: "Quality Products",
-          description: "We source and supply only the highest quality industrial equipment and tools from trusted manufacturers."
+          icon: <Beaker className="text-2xl text-primary" />,
+          title: "Premium Chemicals",
+          description: "We source and supply only the highest quality chemicals and compounds from trusted manufacturers with verified purity and specifications."
         },
         {
-          icon: <Headset className="text-2xl text-primary" />,
-          title: "Expert Support",
-          description: "Our team of experts is always ready to help you find the right solutions for your specific requirements."
+          icon: <ShieldCheck className="text-2xl text-primary" />,
+          title: "Safety Assured",
+          description: "All our products are handled with proper safety protocols and come with complete documentation and safety data sheets."
         },
         {
           icon: <Truck className="text-2xl text-primary" />,
-          title: "Fast Delivery",
-          description: "We ensure quick and reliable delivery of all products to minimize downtime for your business."
+          title: "Pan India Delivery",
+          description: "We ensure quick and reliable delivery of all products across India with proper handling and transportation of hazardous materials."
         }
       ]
     },
     hi: {
       title: "शिवांशी एंटरप्राइजेज में आपका स्वागत है",
-      description: "हम औद्योगिक उपकरण, इलेक्ट्रिक मोटर्स और पावर टूल्स के अग्रणी आपूर्तिकर्ता हैं जो पूरे भारत में व्यवसायों की सेवा करते हैं। गुणवत्ता और ग्राहक संतुष्टि के प्रति प्रतिबद्धता के साथ, हम आपकी सभी औद्योगिक आवश्यकताओं के लिए विश्वसनीय समाधान प्रदान करते हैं।",
+      description: "हम पूरे भारत में उद्योगों की सेवा करने वाले उच्च गुणवत्ता वाले रसायनों और यौगिकों के विश्वसनीय पैन इंडिया आपूर्तिकर्ता हैं। गुणवत्ता और ग्राहक संतुष्टि के प्रति प्रतिबद्धता के साथ, हम आपकी सभी रासायनिक और यौगिक आवश्यकताओं के लिए विश्वसनीय समाधान प्रदान करते हैं।",
       features: [
         {
-          icon: <Medal className="text-2xl text-primary" />,
-          title: "गुणवत्तापूर्ण उत्पाद",
-          description: "हम विश्वसनीय निर्माताओं से केवल उच्चतम गुणवत्ता वाले औद्योगिक उपकरण और उपकरण प्राप्त करते हैं और आपूर्ति करते हैं।"
+          icon: <Beaker className="text-2xl text-primary" />,
+          title: "प्रीमियम रसायन",
+          description: "हम सत्यापित शुद्धता और विनिर्देशों के साथ विश्वसनीय निर्माताओं से केवल उच्चतम गुणवत्ता वाले रसायनों और यौगिकों का स्रोत और आपूर्ति करते हैं।"
         },
         {
-          icon: <Headset className="text-2xl text-primary" />,
-          title: "विशेषज्ञ सहायता",
-          description: "हमारी विशेषज्ञों की टीम आपकी विशिष्ट आवश्यकताओं के लिए सही समाधान खोजने में मदद करने के लिए हमेशा तैयार है।"
+          icon: <ShieldCheck className="text-2xl text-primary" />,
+          title: "सुरक्षा सुनिश्चित",
+          description: "हमारे सभी उत्पादों को उचित सुरक्षा प्रोटोकॉल के साथ संभाला जाता है और पूर्ण दस्तावेज़ीकरण और सुरक्षा डेटा शीट के साथ आते हैं।"
         },
         {
           icon: <Truck className="text-2xl text-primary" />,
-          title: "तेज़ डिलीवरी",
-          description: "हम आपके व्यवसाय के लिए डाउनटाइम को कम करने के लिए सभी उत्पादों की त्वरित और विश्वसनीय डिलीवरी सुनिश्चित करते हैं।"
+          title: "पैन इंडिया डिलीवरी",
+          description: "हम खतरनाक सामग्रियों के उचित हैंडलिंग और परिवहन के साथ पूरे भारत में सभी उत्पादों की त्वरित और विश्वसनीय डिलीवरी सुनिश्चित करते हैं।"
         }
       ]
     }
