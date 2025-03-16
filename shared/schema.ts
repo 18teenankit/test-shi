@@ -27,21 +27,8 @@ export const categories = pgTable("categories", {
 export const products = pgTable("products", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
-  description: text("description"),
   categoryId: integer("category_id").references(() => categories.id),
-  specifications: text("specifications"),
-  inStock: boolean("in_stock").default(true),
-  discount: integer("discount").default(0),
   createdAt: timestamp("created_at").defaultNow(),
-});
-
-// Product Images Table
-export const productImages = pgTable("product_images", {
-  id: serial("id").primaryKey(),
-  productId: integer("product_id").references(() => products.id).notNull(),
-  imageUrl: text("image_url").notNull(),
-  isMain: boolean("is_main").default(false),
-  order: integer("order").default(0),
 });
 
 // Hero Slider Images Table
