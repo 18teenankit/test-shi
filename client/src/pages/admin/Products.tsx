@@ -605,8 +605,8 @@ export default function Products() {
                   }
                 </Button>
               </DialogFooter>
-            </Form>
-          </DialogContent>
+            </DialogContent>
+          </Form>
         </Dialog>
 
       {/* Delete Product Confirmation Dialog */}
