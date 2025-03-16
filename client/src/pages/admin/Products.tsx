@@ -605,10 +605,9 @@ export default function Products() {
                   }
                 </Button>
               </DialogFooter>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
+            </Form>
+          </DialogContent>
+        </Dialog>
 
       {/* Delete Product Confirmation Dialog */}
       <AlertDialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
