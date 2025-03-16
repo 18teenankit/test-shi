@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "wouter";
+import { useLocation } from "wouter";
 import { loginSchema } from "@shared/schema";
 import { z } from "zod";
 import { useAuth } from "@/lib/auth";
@@ -19,7 +19,7 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { login } = useAuth();
-  const [_, navigate] = useRouter();
+  const [_, navigate] = useLocation();
   const { theme, setTheme } = useTheme();
   
   const form = useForm<FormValues>({
