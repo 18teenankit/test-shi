@@ -113,92 +113,41 @@ export class MemStorage implements IStorage {
       createdAt: new Date()
     });
     
-    // Sample categories
-    const categories = [
-      { name: "Electric Motors", description: "High-quality electric motors for industrial use", image: "https://images.unsplash.com/photo-1612441804231-77a36b284856" },
-      { name: "Power Tools", description: "Professional-grade power tools", image: "https://images.unsplash.com/photo-1586864387789-628af9feed72" },
-      { name: "Industrial Equipment", description: "Industrial machinery and equipment", image: "https://images.unsplash.com/photo-1572981779307-38b8cabb2407" },
-      { name: "Spare Parts", description: "Replacement parts for industrial machinery", image: "https://images.unsplash.com/photo-1504148455328-c376907d081c" }
-    ];
+    // Empty categories - to be added from admin panel
+    const categories = [];
     
-    categories.forEach(category => {
-      this.categories.set(this.categoryCurrentId, {
-        id: this.categoryCurrentId,
-        name: category.name,
-        description: category.description,
-        image: category.image,
-        createdAt: new Date()
-      });
-      this.categoryCurrentId++;
-    });
+    // Empty products - to be added from admin panel
+    const products = [];
     
-    // Sample products
-    const products = [
-      { name: "3HP Electric Motor", description: "High-efficiency three-phase electric motor for industrial applications.", categoryId: 1, specifications: "3HP, 380V, 50Hz", inStock: true, discount: 0 },
-      { name: "Heavy Duty Drill Machine", description: "Professional-grade drill machine with variable speed control.", categoryId: 2, specifications: "1200W, 20V, Variable speed", inStock: true, discount: 0 },
-      { name: "Arc Welding Machine", description: "Industrial arc welding machine with thermal protection system.", categoryId: 3, specifications: "200A, 230V, IGBT technology", inStock: true, discount: 0 },
-      { name: "Portable Generator", description: "5kVA portable generator with low noise operation and fuel efficiency.", categoryId: 4, specifications: "5kVA, 220V, Petrol", inStock: false, discount: 0 }
-    ];
+    // Empty product images - to be added from admin panel
+    const productImages = [];
     
-    products.forEach(product => {
-      this.products.set(this.productCurrentId, {
-        id: this.productCurrentId,
-        name: product.name,
-        description: product.description,
-        categoryId: product.categoryId,
-        specifications: product.specifications,
-        inStock: product.inStock,
-        discount: product.discount,
-        createdAt: new Date()
-      });
-      this.productCurrentId++;
-    });
-    
-    // Sample product images
-    const productImages = [
-      { productId: 1, imageUrl: "https://images.unsplash.com/photo-1612441804231-77a36b284856", isMain: true, order: 0 },
-      { productId: 2, imageUrl: "https://images.unsplash.com/photo-1586864387789-628af9feed72", isMain: true, order: 0 },
-      { productId: 3, imageUrl: "https://images.unsplash.com/photo-1572981779307-38b8cabb2407", isMain: true, order: 0 },
-      { productId: 4, imageUrl: "https://images.unsplash.com/photo-1504148455328-c376907d081c", isMain: true, order: 0 }
-    ];
-    
-    productImages.forEach(image => {
-      this.productImages.set(this.productImageCurrentId, {
-        id: this.productImageCurrentId,
-        productId: image.productId,
-        imageUrl: image.imageUrl,
-        isMain: image.isMain,
-        order: image.order
-      });
-      this.productImageCurrentId++;
-    });
-    
-    // Sample hero images
+    // Hero images for chemicals company
     const heroImages = [
       { 
-        imageUrl: "https://images.unsplash.com/photo-1593762149251-d8332d69f6e4",
-        title: "Quality Industrial Solutions",
-        subtitle: "Your trusted partner for industrial equipment and power tools.",
+        imageUrl: "https://images.unsplash.com/photo-1603126857599-f6e157fa2fe6",
+        title: "Quality Chemicals & Compounds",
+        subtitle: "Your trusted partner for industrial chemicals across PAN India.",
         buttonText: "Explore Products",
         buttonLink: "/products",
         order: 0,
         isActive: true
       },
       { 
-        imageUrl: "https://images.unsplash.com/photo-1581094794329-c8112a89af12",
-        title: "High-Performance Motors",
-        subtitle: "Top-quality electric motors for all industrial applications.",
-        buttonText: "View Motors",
-        buttonLink: "/category/1",
+        imageUrl: "https://images.unsplash.com/photo-1532187863486-abf9dbad1b69",
+        title: "Industrial Chemical Solutions",
+        subtitle: "Premium quality chemicals for manufacturing and industrial applications.",
+        buttonText: "View Products",
+        buttonLink: "/products",
         order: 1,
         isActive: true
       },
       { 
-        imageUrl: "https://images.unsplash.com/photo-1530124566582-a618bc2615dc",
-        title: "Professional Tools",
-        subtitle: "Durable and efficient power tools for professionals.",
-        buttonText: "Shop Tools",
-        buttonLink: "/category/2",
+        imageUrl: "https://images.unsplash.com/photo-1581093196277-9f608af9db55",
+        title: "Nationwide Delivery",
+        subtitle: "Fast and reliable shipping across all of India.",
+        buttonText: "Contact Us",
+        buttonLink: "/contact",
         order: 2,
         isActive: true
       }
@@ -221,15 +170,15 @@ export class MemStorage implements IStorage {
     // Default settings
     const defaultSettings = [
       { key: "company_name", value: "Shivanshi Enterprises" },
-      { key: "company_address", value: "123 Industrial Area, Sector 5, Noida, Uttar Pradesh, India" },
-      { key: "company_phone", value: "+91 98765 43210" },
-      { key: "company_email", value: "info@shivanshienterprises.com" },
+      { key: "company_tagline", value: "Chemicals & Compound Dealers" },
+      { key: "company_address", value: "55 2B 9 SANGAM ROAD NAINI INDUSTRIAL AREA PRAYAGRAJ UTTAR PRADESH INDIA- 211008" },
+      { key: "company_phone", value: "+91 9418974444" },
+      { key: "company_email", value: "shivanshienterprises44@gmail.com" },
       { key: "company_hours", value: "Monday - Saturday: 9:00 AM - 6:00 PM" },
-      { key: "social_facebook", value: "https://facebook.com/shivanshienterprises" },
-      { key: "social_instagram", value: "https://instagram.com/shivanshienterprises" },
-      { key: "social_linkedin", value: "https://linkedin.com/company/shivanshienterprises" },
-      { key: "social_whatsapp", value: "+919876543210" },
-      { key: "google_maps_url", value: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3502.5233457151397!2d77.31303731508094!3d28.609911782428377!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390ce57ca5ff4435%3A0x6de631b7a5bfdacb!2sIndustrial%20Area%2C%20Sector%2063%2C%20Noida%2C%20Uttar%20Pradesh%20201301!5e0!3m2!1sen!2sin!4v1620638123456!5m2!1sen!2sin" }
+      { key: "company_delivery", value: "Pan India Delivery Available" },
+      { key: "social_whatsapp", value: "+919418974444" },
+      { key: "social_whatsapp_link", value: "https://wa.me/919418974444" },
+      { key: "google_maps_url", value: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3602.9321413865613!2d81.7956!3d25.3503!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjXCsDIxJzAxLjAiTiA4McKwNDcnNDQuMiJF!5e0!3m2!1sen!2sin!4v1615473046844!5m2!1sen!2sin" }
     ];
     
     defaultSettings.forEach(setting => {
