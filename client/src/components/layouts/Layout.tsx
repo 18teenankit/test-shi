@@ -4,7 +4,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useTheme } from "@/components/ThemeProvider";
 import { Logo } from "@/components/ui/logo";
 import { CategoryDropdown } from "@/components/ui/category-dropdown";
-import { LanguageSwitcher } from "@/components/ui/language-switcher";
 import { WhatsAppButton } from "@/components/ui/whatsapp-button";
 import { Footer } from "@/components/sections/Footer";
 import { Button } from "@/components/ui/button";
@@ -20,26 +19,30 @@ export function Layout({ children }: LayoutProps) {
   const [location] = useLocation();
   const isMobile = useMobile();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [language, setLanguage] = useState<"en" | "hi">("en");
-  
-  // Settings query
-  const { data: settings } = useQuery({
+
+  // Settings query - the type specifies that it's a Record with string keys and string values
+  const { data: settings = {} } = useQuery<Record<string, string>>({
     queryKey: ["/api/settings"],
   });
-  
+
   // Effect to close mobile menu when changing page
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [location]);
-  
+
+  // Effect to scroll to top when route changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location]);
+
   const toggleTheme = () => {
     setTheme(theme === "light" ? "dark" : "light");
   };
-  
+
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
-  
+
   return (
     <div className="flex flex-col min-h-screen">
       <header className="sticky top-0 bg-white dark:bg-card z-50 shadow-md">
@@ -49,29 +52,38 @@ export function Layout({ children }: LayoutProps) {
             <Link href="/" className="flex items-center space-x-2">
               <Logo />
               <span className="text-xl font-bold text-primary dark:text-primary">
-                {settings?.company_name || "Shivanshi Enterprises"}
+                {settings.company_name || "Shivanshi Enterprises"}
               </span>
             </Link>
-            
+
             {/* Desktop Navigation */}
             {!isMobile && (
               <nav className="flex space-x-8">
-                <Link href="/" className="font-medium hover:text-primary dark:hover:text-primary transition-colors">
-                  {language === "en" ? "Home" : "होम"}
+                <Link
+                  href="/"
+                  className="font-medium hover:text-primary dark:hover:text-primary transition-colors"
+                >
+                  Home
                 </Link>
-                
-                <CategoryDropdown language={language} />
-                
-                <Link href="/about" className="font-medium hover:text-primary dark:hover:text-primary transition-colors">
-                  {language === "en" ? "About Us" : "हमारे बारे में"}
+
+                <CategoryDropdown />
+
+                <Link
+                  href="/about"
+                  className="font-medium hover:text-primary dark:hover:text-primary transition-colors"
+                >
+                  About Us
                 </Link>
-                
-                <Link href="/contact" className="font-medium hover:text-primary dark:hover:text-primary transition-colors">
-                  {language === "en" ? "Contact" : "संपर्क करें"}
+
+                <Link
+                  href="/contact"
+                  className="font-medium hover:text-primary dark:hover:text-primary transition-colors"
+                >
+                  Contact
                 </Link>
               </nav>
             )}
-            
+
             <div className="flex items-center space-x-4">
               {/* Theme Toggle */}
               <Button
@@ -86,7 +98,7 @@ export function Layout({ children }: LayoutProps) {
                   <Sun className="h-5 w-5" />
                 )}
               </Button>
-              
+
               {/* Mobile Menu Button */}
               {isMobile && (
                 <Button
@@ -105,42 +117,48 @@ export function Layout({ children }: LayoutProps) {
             </div>
           </div>
         </div>
-        
+
         {/* Mobile Navigation */}
         {isMobile && isMobileMenuOpen && (
           <div className="bg-white dark:bg-card border-t dark:border-border py-4">
             <div className="container mx-auto px-4 space-y-3">
-              <Link href="/" className="block font-medium hover:text-primary dark:hover:text-primary py-2 transition-colors">
-                {language === "en" ? "Home" : "होम"}
+              <Link
+                href="/"
+                className="block font-medium hover:text-primary dark:hover:text-primary py-2 transition-colors"
+              >
+                Home
               </Link>
-              
+
               <div className="py-2">
-                <CategoryDropdown isMobile language={language} />
+                <CategoryDropdown isMobile />
               </div>
-              
-              <Link href="/about" className="block font-medium hover:text-primary dark:hover:text-primary py-2 transition-colors">
-                {language === "en" ? "About Us" : "हमारे बारे में"}
+
+              <Link
+                href="/about"
+                className="block font-medium hover:text-primary dark:hover:text-primary py-2 transition-colors"
+              >
+                About Us
               </Link>
-              
-              <Link href="/contact" className="block font-medium hover:text-primary dark:hover:text-primary py-2 transition-colors">
-                {language === "en" ? "Contact" : "संपर्क करें"}
+
+              <Link
+                href="/contact"
+                className="block font-medium hover:text-primary dark:hover:text-primary py-2 transition-colors"
+              >
+                Contact
               </Link>
             </div>
           </div>
         )}
       </header>
-      
-      <main className="flex-grow">
-        {children}
-      </main>
-      
-      <Footer language={language} />
-      
-      {/* Language Switcher */}
-      <LanguageSwitcher language={language} setLanguage={setLanguage} />
-      
+
+      <main className="flex-grow">{children}</main>
+
+      <Footer />
+
       {/* WhatsApp Button */}
-      <WhatsAppButton whatsappNumber={settings?.social_whatsapp || "+919876543210"} />
+      <WhatsAppButton
+        whatsappNumber={settings.social_whatsapp || "+919418974444"}
+      />
     </div>
   );
 }

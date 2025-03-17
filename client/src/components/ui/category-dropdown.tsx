@@ -7,20 +7,20 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { Category } from "@shared/schema";
 
 interface CategoryDropdownProps {
   isMobile?: boolean;
-  language?: "en" | "hi";
 }
 
-export function CategoryDropdown({ isMobile = false, language = "en" }: CategoryDropdownProps) {
+export function CategoryDropdown({ isMobile = false }: CategoryDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   
-  const { data: categories, isLoading } = useQuery({
+  const { data: categories = [], isLoading } = useQuery<Category[]>({
     queryKey: ["/api/categories"],
   });
   
-  const categoryLabel = language === "en" ? "Products" : "उत्पाद";
+  const categoryLabel = "Products";
   
   if (isMobile) {
     return (
@@ -38,7 +38,7 @@ export function CategoryDropdown({ isMobile = false, language = "en" }: Category
             <div className="py-2 text-muted-foreground">Loading...</div>
           ) : (
             <>
-              {categories?.map((category: any) => (
+              {categories.map((category) => (
                 <Link key={category.id} href={`/category/${category.id}`} className="block py-2 hover:text-primary dark:hover:text-primary transition-colors">
                   {category.name}
                 </Link>
@@ -61,7 +61,7 @@ export function CategoryDropdown({ isMobile = false, language = "en" }: Category
           <div className="px-4 py-2 text-muted-foreground">Loading...</div>
         ) : (
           <>
-            {categories?.map((category: any) => (
+            {categories.map((category) => (
               <Link key={category.id} href={`/category/${category.id}`} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                 {category.name}
               </Link>

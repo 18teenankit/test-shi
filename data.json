@@ -6,6 +6,181 @@
       "description": "",
       "categoryId": 1,
       "createdAt": "2025-03-16T21:30:27.372Z"
+    },
+    "7": {
+      "id": 7,
+      "name": "Benzene",
+      "description": "",
+      "categoryId": 1,
+      "createdAt": "2025-03-17T04:12:52.894Z"
+    },
+    "8": {
+      "id": 8,
+      "name": "Hexene",
+      "description": "",
+      "categoryId": 1,
+      "createdAt": "2025-03-17T04:13:11.004Z"
+    },
+    "9": {
+      "id": 9,
+      "name": "Cyclohexane",
+      "description": "",
+      "categoryId": 1,
+      "createdAt": "2025-03-17T04:14:04.529Z"
+    },
+    "10": {
+      "id": 10,
+      "name": "Cyclohexanone",
+      "description": "",
+      "categoryId": 1,
+      "createdAt": "2025-03-17T04:15:21.019Z"
+    },
+    "11": {
+      "id": 11,
+      "name": "Acetone",
+      "description": "",
+      "categoryId": 1,
+      "createdAt": "2025-03-17T04:15:40.833Z"
+    },
+    "12": {
+      "id": 12,
+      "name": "Acetonitrile",
+      "description": "",
+      "categoryId": 1,
+      "createdAt": "2025-03-17T04:15:55.928Z"
+    },
+    "13": {
+      "id": 13,
+      "name": "Di Iso Propyl Ether",
+      "description": "",
+      "categoryId": 1,
+      "createdAt": "2025-03-17T04:16:10.644Z"
+    },
+    "14": {
+      "id": 14,
+      "name": "Mix-Xylene",
+      "description": "",
+      "categoryId": 1,
+      "createdAt": "2025-03-17T04:16:44.384Z"
+    },
+    "15": {
+      "id": 15,
+      "name": "Ortho-Xylene",
+      "description": "",
+      "categoryId": 1,
+      "createdAt": "2025-03-17T04:17:00.303Z"
+    },
+    "16": {
+      "id": 16,
+      "name": "N-Hexane",
+      "description": "",
+      "categoryId": 1,
+      "createdAt": "2025-03-17T04:17:15.569Z"
+    },
+    "17": {
+      "id": 17,
+      "name": " Iso Butyl Alcohol (ISO Butanol)",
+      "description": "",
+      "categoryId": 2,
+      "createdAt": "2025-03-17T04:54:32.647Z"
+    },
+    "18": {
+      "id": 18,
+      "name": "Iso Propyl Alcohol (IPA)",
+      "description": "",
+      "categoryId": 2,
+      "createdAt": "2025-03-17T04:55:18.679Z"
+    },
+    "19": {
+      "id": 19,
+      "name": "Mono Ethylene Glycol (MEG)",
+      "description": "",
+      "categoryId": 2,
+      "createdAt": "2025-03-17T04:55:41.758Z"
+    },
+    "20": {
+      "id": 20,
+      "name": "Di Ethylene Glycol (DEG)",
+      "description": "",
+      "categoryId": 2,
+      "createdAt": "2025-03-17T04:56:03.598Z"
+    },
+    "21": {
+      "id": 21,
+      "name": "Tri Ethylene Glycol",
+      "description": "",
+      "categoryId": 2,
+      "createdAt": "2025-03-17T04:56:20.149Z"
+    },
+    "22": {
+      "id": 22,
+      "name": "Isopropoxy Ethanol",
+      "description": "",
+      "categoryId": 2,
+      "createdAt": "2025-03-17T04:56:46.250Z"
+    },
+    "23": {
+      "id": 23,
+      "name": " Ethanol",
+      "description": "",
+      "categoryId": 2,
+      "createdAt": "2025-03-17T04:56:59.990Z"
+    },
+    "24": {
+      "id": 24,
+      "name": "Octanol",
+      "description": "",
+      "categoryId": 2,
+      "createdAt": "2025-03-17T04:57:15.169Z"
+    },
+    "25": {
+      "id": 25,
+      "name": "Propylene Glycol",
+      "description": "",
+      "categoryId": 2,
+      "createdAt": "2025-03-17T04:57:32.298Z"
+    },
+    "26": {
+      "id": 26,
+      "name": "Phosphoric Acid",
+      "description": "",
+      "categoryId": 3,
+      "createdAt": "2025-03-17T04:58:58.970Z"
+    },
+    "27": {
+      "id": 27,
+      "name": "Acetic Acid",
+      "description": "",
+      "categoryId": 3,
+      "createdAt": "2025-03-17T04:59:14.283Z"
+    },
+    "28": {
+      "id": 28,
+      "name": "Oxalic Acid (Powder)",
+      "description": "",
+      "categoryId": 3,
+      "createdAt": "2025-03-17T04:59:30.540Z"
+    },
+    "29": {
+      "id": 29,
+      "name": "Oxalic Acid",
+      "description": "",
+      "categoryId": 3,
+      "createdAt": "2025-03-17T04:59:50.509Z"
+    },
+    "30": {
+      "id": 30,
+      "name": "Hydrochloride",
+      "description": "",
+      "categoryId": 3,
+      "createdAt": "2025-03-17T05:00:09.847Z"
+    },
+    "31": {
+      "id": 31,
+      "name": "Hydrobromic Acid (48%)",
+      "description": "",
+      "categoryId": 3,
+      "createdAt": "2025-03-17T05:00:22.582Z"
     }
   },
   "categories": {

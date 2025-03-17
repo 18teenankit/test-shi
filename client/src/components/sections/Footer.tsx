@@ -2,52 +2,33 @@ import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Logo } from "@/components/ui/logo";
 import { MapPin, Phone, Mail, Clock } from "lucide-react";
+import { Category } from "@shared/schema";
 
-interface FooterProps {
-  language?: "en" | "hi";
-}
+interface FooterProps {}
 
-export function Footer({ language = "en" }: FooterProps) {
-  const { data: settings } = useQuery({
+export function Footer({}: FooterProps) {
+  const { data: settings = {} } = useQuery<Record<string, string>>({
     queryKey: ["/api/settings"],
   });
   
-  const { data: categories } = useQuery({
+  const { data: categories = [] } = useQuery<Category[]>({
     queryKey: ["/api/categories"],
   });
   
   const content = {
-    en: {
-      description: "Your trusted partner for high-quality chemicals and compounds across India. Quality, safety, and reliability since 2010.",
-      products: "Products",
-      quickLinks: "Quick Links",
-      home: "Home",
-      about: "About Us",
-      contact: "Contact",
-      terms: "Terms & Conditions",
-      contactInfo: "Contact Info",
-      allRights: "All rights reserved.",
-      privacy: "Privacy Policy",
-      termsOfService: "Terms of Service",
-      sitemap: "Sitemap"
-    },
-    hi: {
-      description: "पूरे भारत में उच्च गुणवत्ता वाले रसायनों और यौगिकों के लिए आपका विश्वसनीय साथी। 2010 से गुणवत्ता, सुरक्षा और विश्वसनीयता।",
-      products: "उत्पाद",
-      quickLinks: "त्वरित लिंक",
-      home: "होम",
-      about: "हमारे बारे में",
-      contact: "संपर्क",
-      terms: "नियम और शर्तें",
-      contactInfo: "संपर्क जानकारी",
-      allRights: "सर्वाधिकार सुरक्षित।",
-      privacy: "गोपनीयता नीति",
-      termsOfService: "सेवा की शर्तें",
-      sitemap: "साइटमैप"
-    }
+    description: "Your trusted partner for high-quality chemicals and compounds across India. Quality, safety, and reliability since 2010.",
+    products: "Products",
+    quickLinks: "Quick Links",
+    home: "Home",
+    about: "About Us",
+    contact: "Contact",
+    terms: "Terms & Conditions",
+    contactInfo: "Contact Info",
+    allRights: "All rights reserved.",
+    privacy: "Privacy Policy",
+    termsOfService: "Terms of Service",
+    sitemap: "Sitemap"
   };
-  
-  const currentContent = language === "en" ? content.en : content.hi;
   
   return (
     <footer className="bg-gray-800 text-white pt-12 pb-6">
@@ -61,7 +42,7 @@ export function Footer({ language = "en" }: FooterProps) {
               </h3>
             </div>
             <p className="text-gray-300 mb-4">
-              {currentContent.description}
+              {content.description}
             </p>
             <div className="flex space-x-4">
               {settings?.social_facebook && (
@@ -135,9 +116,9 @@ export function Footer({ language = "en" }: FooterProps) {
           </div>
           
           <div>
-            <h3 className="text-xl font-semibold mb-4">{currentContent.products}</h3>
+            <h3 className="text-xl font-semibold mb-4">{content.products}</h3>
             <ul className="space-y-2">
-              {categories?.map((category: any) => (
+              {categories.map((category) => (
                 <li key={category.id}>
                   <Link href={`/category/${category.id}`} className="text-gray-300 hover:text-white transition-colors">
                     {category.name}
@@ -149,38 +130,38 @@ export function Footer({ language = "en" }: FooterProps) {
           </div>
           
           <div>
-            <h3 className="text-xl font-semibold mb-4">{currentContent.quickLinks}</h3>
+            <h3 className="text-xl font-semibold mb-4">{content.quickLinks}</h3>
             <ul className="space-y-2">
               <li>
                 <Link href="/" className="text-gray-300 hover:text-white transition-colors">
-                  {currentContent.home}
+                  {content.home}
                 </Link>
               </li>
               <li>
                 <Link href="/about" className="text-gray-300 hover:text-white transition-colors">
-                  {currentContent.about}
+                  {content.about}
                 </Link>
               </li>
               <li>
                 <Link href="/products" className="text-gray-300 hover:text-white transition-colors">
-                  {language === "en" ? "Products" : "उत्पाद"}
+                  Products
                 </Link>
               </li>
               <li>
                 <Link href="/contact" className="text-gray-300 hover:text-white transition-colors">
-                  {currentContent.contact}
+                  {content.contact}
                 </Link>
               </li>
               <li>
                 <Link href="/terms" className="text-gray-300 hover:text-white transition-colors">
-                  {currentContent.terms}
+                  {content.terms}
                 </Link>
               </li>
             </ul>
           </div>
           
           <div>
-            <h3 className="text-xl font-semibold mb-4">{currentContent.contactInfo}</h3>
+            <h3 className="text-xl font-semibold mb-4">{content.contactInfo}</h3>
             <ul className="space-y-3">
               <li className="flex items-start">
                 <MapPin className="h-5 w-5 mt-1 mr-3" />
@@ -207,17 +188,17 @@ export function Footer({ language = "en" }: FooterProps) {
         <div className="border-t border-gray-700 pt-6 mt-6">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-400 text-sm mb-4 md:mb-0">
-              © {new Date().getFullYear()} {settings?.company_name || "Shivanshi Enterprises"}. {currentContent.allRights}
+              © {new Date().getFullYear()} {settings?.company_name || "Shivanshi Enterprises"}. {content.allRights}
             </p>
             <div className="flex space-x-4">
               <Link href="/privacy" className="text-gray-400 text-sm hover:text-white transition-colors">
-                {currentContent.privacy}
+                {content.privacy}
               </Link>
               <Link href="/terms" className="text-gray-400 text-sm hover:text-white transition-colors">
-                {currentContent.termsOfService}
+                {content.termsOfService}
               </Link>
               <Link href="/sitemap" className="text-gray-400 text-sm hover:text-white transition-colors">
-                {currentContent.sitemap}
+                {content.sitemap}
               </Link>
             </div>
           </div>
