@@ -1,22 +1,34 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { ProductCard } from "@/components/ui/product-card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ArrowRight } from "lucide-react";
 
 interface FeaturedProductsProps {
   language?: "en" | "hi";
 }
 
+interface Product {
+  id: number;
+  name: string;
+  description: string;
+  price?: string;
+  stockStatus?: string;
+  mainImage?: string | null;
+  [key: string]: any;
+}
+
 export function FeaturedProducts({ language = "en" }: FeaturedProductsProps) {
-  const { data: products, isLoading, error } = useQuery({
+  const { data: products = [], isLoading, error } = useQuery<Product[]>({
     queryKey: ["/api/products"],
   });
   
   const content = {
     en: {
       title: "Featured Products",
-      description: "Explore our selection of high-quality industrial equipment and tools",
+      description: "Explore our selection of high-quality chemicals and compounds",
       viewAllButton: "View All Products",
       loadingText: "Loading products...",
       errorText: "Failed to load products.",
@@ -24,7 +36,7 @@ export function FeaturedProducts({ language = "en" }: FeaturedProductsProps) {
     },
     hi: {
       title: "विशेष उत्पाद",
-      description: "हमारे उच्च-गुणवत्ता वाले औद्योगिक उपकरणों और उपकरणों का चयन करें",
+      description: "हमारे उच्च-गुणवत्ता वाले रसायनों और यौगिकों का चयन करें",
       viewAllButton: "सभी उत्पाद देखें",
       loadingText: "उत्पाद लोड हो रहे हैं...",
       errorText: "उत्पाद लोड करने में विफल।",

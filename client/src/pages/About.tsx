@@ -11,43 +11,43 @@ export default function About() {
   const content = {
     en: {
       title: "About Shivanshi Enterprises",
-      subtitle: "Your Trusted Partner in Industrial Solutions",
-      intro: "Shivanshi Enterprises has been a leading supplier of high-quality industrial equipment, electric motors, and power tools since 2005. We take pride in offering exceptional products and services to businesses across India.",
+      subtitle: "Your Trusted Partner in Chemicals & Compounds",
+      intro: "Shivanshi Enterprises has been a leading supplier of high-quality chemicals and compounds. We take pride in offering exceptional products and services to businesses across India.",
       mission: {
         title: "Our Mission",
-        text: "To provide reliable industrial equipment and exceptional service that empowers businesses to achieve operational excellence."
+        text: "To provide reliable chemicals and compounds with exceptional service that empowers businesses to achieve operational excellence."
       },
       vision: {
         title: "Our Vision",
-        text: "To be the most trusted partner for industrial solutions, known for quality, reliability, and customer satisfaction."
+        text: "To be the most trusted partner for chemical solutions, known for quality, reliability, and customer satisfaction."
       },
       values: {
         title: "Our Values",
         items: [
-          "Quality: We source only the best products from reputable manufacturers",
+          "Quality: We source only the best chemicals from reputable manufacturers",
           "Integrity: We conduct our business with honesty and transparency",
           "Service: We are committed to exceeding customer expectations",
-          "Innovation: We continuously evolve to meet changing market needs",
+          "Safety: We prioritize safety in all our chemical handling and delivery processes",
           "Expertise: We provide specialized knowledge and solutions"
         ]
       },
       commitment: {
         title: "Our Commitment",
-        text: "At Shivanshi Enterprises, we are committed to ensuring that our customers receive the highest quality products and services. We understand the critical role that reliable equipment plays in your business operations, and we strive to be your trusted partner in meeting those needs."
+        text: "At Shivanshi Enterprises, we are committed to ensuring that our customers receive the highest quality chemicals and compounds. We understand the critical role that reliable and pure chemicals play in your business operations, and we strive to be your trusted partner in meeting those needs."
       },
       contactButton: "Contact Us"
     },
     hi: {
       title: "शिवांशी एंटरप्राइजेज के बारे में",
-      subtitle: "औद्योगिक समाधानों में आपका विश्वसनीय साथी",
-      intro: "शिवांशी एंटरप्राइजेज 2005 से उच्च-गुणवत्ता वाले औद्योगिक उपकरण, इलेक्ट्रिक मोटर्स और पावर टूल्स का अग्रणी आपूर्तिकर्ता रहा है। हम पूरे भारत में व्यवसायों को असाधारण उत्पाद और सेवाएं प्रदान करने पर गर्व करते हैं।",
+      subtitle: "रसायन और यौगिकों में आपका विश्वसनीय साथी",
+      intro: "शिवांशी एंटरप्राइजेज उच्च-गुणवत्ता वाले रसायनों और यौगिकों का अग्रणी आपूर्तिकर्ता रहा है। हम पूरे भारत में व्यवसायों को असाधारण उत्पाद और सेवाएं प्रदान करने पर गर्व करते हैं।",
       mission: {
         title: "हमारा मिशन",
-        text: "विश्वसनीय औद्योगिक उपकरण और असाधारण सेवा प्रदान करना जो व्यवसायों को परिचालन उत्कृष्टता प्राप्त करने के लिए सशक्त बनाती है।"
+        text: "विश्वसनीय रसायन और यौगिक प्रदान करना जो व्यवसायों को परिचालन उत्कृष्टता प्राप्त करने के लिए सशक्त बनाती है।"
       },
       vision: {
         title: "हमारी विजन",
-        text: "गुणवत्ता, विश्वसनीयता और ग्राहक संतुष्टि के लिए जाना जाने वाला औद्योगिक समाधानों के लिए सबसे विश्वसनीय भागीदार बनना।"
+        text: "गुणवत्ता, विश्वसनीयता और ग्राहक संतुष्टि के लिए जाना जाने वाला रासायनिक समाधानों के लिए सबसे विश्वसनीय भागीदार बनना।"
       },
       values: {
         title: "हमारे मूल्य",

@@ -16,7 +16,7 @@ export function Footer({}: FooterProps) {
   });
   
   const content = {
-    description: "Your trusted partner for high-quality chemicals and compounds across India. Quality, safety, and reliability since 2010.",
+    description: "Your trusted partner for high-quality chemicals and compounds across India. Quality, safety, and reliability.",
     products: "Products",
     quickLinks: "Quick Links",
     home: "Home",
@@ -26,8 +26,7 @@ export function Footer({}: FooterProps) {
     contactInfo: "Contact Info",
     allRights: "All rights reserved.",
     privacy: "Privacy Policy",
-    termsOfService: "Terms of Service",
-    sitemap: "Sitemap"
+    termsOfService: "Terms of Service"
   };
   
   return (
@@ -195,9 +194,6 @@ export function Footer({}: FooterProps) {
               </Link>
               <Link href="/terms" className="text-gray-400 text-sm hover:text-white transition-colors">
                 {content.termsOfService}
-              </Link>
-              <Link href="/sitemap" className="text-gray-400 text-sm hover:text-white transition-colors">
-                {content.sitemap}
               </Link>
             </div>
           </div>

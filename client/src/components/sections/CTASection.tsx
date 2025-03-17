@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
@@ -6,27 +7,32 @@ interface CTASectionProps {
   language?: "en" | "hi";
 }
 
+interface Settings {
+  social_whatsapp?: string;
+  [key: string]: string | undefined;
+}
+
 export function CTASection({ language = "en" }: CTASectionProps) {
-  const { data: settings } = useQuery({
+  const { data: settings = {} as Settings } = useQuery<Settings>({
     queryKey: ["/api/settings"],
   });
   
   const whatsappNumber = settings?.social_whatsapp || "+919876543210";
   const whatsappUrl = `https://wa.me/${whatsappNumber.replace(/\D/g, "")}?text=${encodeURIComponent(
     language === "en" 
-      ? "Hello! I need assistance with industrial equipment." 
-      : "नमस्ते! मुझे औद्योगिक उपकरण के साथ सहायता की आवश्यकता है।"
+      ? "Hello! I need assistance with chemicals and compounds." 
+      : "नमस्ते! मुझे रसायनों और यौगिकों के साथ सहायता की आवश्यकता है।"
   )}`;
   
   const content = {
     en: {
-      title: "Need help finding the right equipment?",
+      title: "Need help finding the right chemicals?",
       subtitle: "Our experts are ready to assist you with your specific requirements.",
       contactButton: "Contact Us",
       whatsappButton: "WhatsApp"
     },
     hi: {
-      title: "सही उपकरण खोजने में मदद चाहिए?",
+      title: "सही रसायन खोजने में मदद चाहिए?",
       subtitle: "हमारे विशेषज्ञ आपकी विशिष्ट आवश्यकताओं के साथ आपकी सहायता करने के लिए तैयार हैं।",
       contactButton: "संपर्क करें",
       whatsappButton: "व्हाट्सएप"

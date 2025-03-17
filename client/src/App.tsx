@@ -15,6 +15,10 @@ import NotFound from "@/pages/not-found";
 import Products from "@/pages/Products"; // Added import
 import CategoryProducts from "@/pages/CategoryProducts"; // Added import
 
+// Legal pages
+import Privacy from "@/pages/legal/Privacy";
+import Terms from "@/pages/legal/Terms";
+
 // Admin pages
 import Login from "@/pages/admin/Login";
 import Dashboard from "@/pages/admin/Dashboard";
@@ -63,6 +67,10 @@ function App() {
             <Route path="/product/:id" component={ProductDetail} />
             <Route path="/products" component={Products} /> {/* Added route */}
             <Route path="/category/:id" component={CategoryProducts} /> {/* Added route */}
+            
+            {/* Legal Routes */}
+            <Route path="/privacy" component={Privacy} />
+            <Route path="/terms" component={Terms} />
 
             {/* Login route (special case) */}
             <Route path="/admin/login" component={Login} />
