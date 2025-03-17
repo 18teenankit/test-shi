@@ -11,11 +11,13 @@ import Contact from "@/pages/Contact";
 import ProductCategory from "@/pages/ProductCategory";
 import ProductDetail from "@/pages/ProductDetail";
 import NotFound from "@/pages/not-found";
+import Products from "@/pages/Products"; // Added import
+import CategoryProducts from "@/pages/CategoryProducts"; // Added import
 
 // Admin pages
 import Login from "@/pages/admin/Login";
 import Dashboard from "@/pages/admin/Dashboard";
-import Products from "@/pages/admin/Products";
+import ProductsAdmin from "@/pages/admin/Products"; // Renamed to avoid conflict
 import Categories from "@/pages/admin/Categories";
 import HeroImages from "@/pages/admin/HeroImages";
 import ContactRequests from "@/pages/admin/ContactRequests";
@@ -40,17 +42,19 @@ function App() {
             <Route path="/contact" component={Contact} />
             <Route path="/category/:id" component={ProductCategory} />
             <Route path="/product/:id" component={ProductDetail} />
-            
+            <Route path="/products" component={Products} /> {/* Added route */}
+            <Route path="/category/:id" component={CategoryProducts} /> {/* Added route */}
+
             {/* Admin Routes */}
             <Route path="/admin" component={Dashboard} />
             <Route path="/admin/login" component={Login} />
-            <Route path="/admin/products" component={Products} />
+            <Route path="/admin/products" component={ProductsAdmin} />
             <Route path="/admin/categories" component={Categories} />
             <Route path="/admin/hero-images" component={HeroImages} />
             <Route path="/admin/contact-requests" component={ContactRequests} />
             <Route path="/admin/settings" component={Settings} />
             <Route path="/admin/users" component={Users} />
-            
+
             {/* Fallback to 404 */}
             <Route component={NotFound} />
           </Switch>
