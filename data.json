@@ -181,6 +181,27 @@
       "description": "",
       "categoryId": 3,
       "createdAt": "2025-03-17T05:00:22.582Z"
+    },
+    "32": {
+      "id": 32,
+      "name": "Sodium Bromide (45%)",
+      "description": "",
+      "categoryId": 4,
+      "createdAt": "2025-03-17T16:56:02.856Z"
+    },
+    "33": {
+      "id": 33,
+      "name": "Calcium Bromide",
+      "description": "",
+      "categoryId": 4,
+      "createdAt": "2025-03-17T16:56:43.639Z"
+    },
+    "34": {
+      "id": 34,
+      "name": "Potassium Bromide",
+      "description": "",
+      "categoryId": 4,
+      "createdAt": "2025-03-17T16:57:14.647Z"
     }
   },
   "categories": {

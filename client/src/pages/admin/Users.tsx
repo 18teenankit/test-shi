@@ -15,7 +15,9 @@ import {
   ShieldCheck,
   Settings,
   MoreHorizontal,
-  UserCog
+  UserCog,
+  Eye,
+  EyeOff
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -62,6 +64,8 @@ export default function Users() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [openAddDialog, setOpenAddDialog] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   
   // Check if current user is super_admin
   if (!currentUser || currentUser.role !== "super_admin") {
@@ -212,7 +216,26 @@ export default function Users() {
                       <FormItem>
                         <FormLabel>Password</FormLabel>
                         <FormControl>
-                          <Input type="password" placeholder="Enter password" {...field} />
+                          <div className="relative">
+                            <Input 
+                              type={showPassword ? "text" : "password"} 
+                              placeholder="Enter password" 
+                              {...field} 
+                            />
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                              onClick={() => setShowPassword(!showPassword)}
+                            >
+                              {showPassword ? (
+                                <EyeOff className="h-4 w-4 text-gray-500" />
+                              ) : (
+                                <Eye className="h-4 w-4 text-gray-500" />
+                              )}
+                            </Button>
+                          </div>
                         </FormControl>
                         <FormDescription>
                           Password must be at least 6 characters.
@@ -229,7 +252,26 @@ export default function Users() {
                       <FormItem>
                         <FormLabel>Confirm Password</FormLabel>
                         <FormControl>
-                          <Input type="password" placeholder="Confirm password" {...field} />
+                          <div className="relative">
+                            <Input 
+                              type={showConfirmPassword ? "text" : "password"} 
+                              placeholder="Confirm password" 
+                              {...field} 
+                            />
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            >
+                              {showConfirmPassword ? (
+                                <EyeOff className="h-4 w-4 text-gray-500" />
+                              ) : (
+                                <Eye className="h-4 w-4 text-gray-500" />
+                              )}
+                            </Button>
+                          </div>
                         </FormControl>
                         <FormMessage />
                       </FormItem>

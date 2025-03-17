@@ -24,7 +24,7 @@ const loginAttempts = new Map<string, { count: number, lockUntil?: number }>();
 // Configure multer for file uploads
 const storage_config = multer.diskStorage({
   destination: function (req, file, cb) {
-    const uploadDir = path.join(__dirname, "public", "uploads");
+    const uploadDir = path.join(process.cwd(), "uploads");
 
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir, { recursive: true });
@@ -40,18 +40,24 @@ const storage_config = multer.diskStorage({
 const upload = multer({ storage: storage_config });
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Serve static files from uploads directory
+  app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+  
   // Configure session middleware
   app.use(
     session({
       secret: process.env.SESSION_SECRET || "shivanshi-enterprises-secret",
-      resave: true,
+      resave: false,
       saveUninitialized: true,
       cookie: { 
         maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-        secure: false 
+        secure: false,
+        httpOnly: true,
+        path: '/',
+        sameSite: 'lax'
       },
       store: new MemoryStoreSession({
-        checkPeriod: 86400000,
+        checkPeriod: 86400000, // 1 day
       }),
     })
   );
@@ -241,6 +247,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return acc;
       }, {} as Record<string, string | undefined>);
 
+      // Prevent caching of settings
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+      
       res.json(settingsObj);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch settings" });
@@ -251,6 +262,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/login", (req, res, next) => {
     try {
       const loginData = loginSchema.parse(req.body);
+      console.log("Login attempt for:", loginData.username);
+
+      // Check if user is already authenticated
+      if (req.isAuthenticated()) {
+        console.log("User already authenticated");
+        // If already authenticated, return the current user
+        if (req.user) {
+          const user = req.user as any;
+          const safeUser = {
+            id: user.id,
+            username: user.username,
+            role: user.role
+          };
+          return res.json({ user: safeUser });
+        }
+      }
 
       // Check if user is locked out
       const attempts = loginAttempts.get(loginData.username) || { count: 0 };
@@ -262,13 +289,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       passport.authenticate("local", (err, user, info) => {
-        if (err) return next(err);
+        if (err) {
+          console.error("Authentication error:", err);
+          return next(err);
+        }
+        
         if (!user) {
+          console.log("Authentication failed:", info.message);
           return res.status(401).json({ message: info.message });
         }
 
         req.logIn(user, (err) => {
-          if (err) return next(err);
+          if (err) {
+            console.error("Login error:", err);
+            return next(err);
+          }
 
           // Set session cookie to expire in 30 days
           if (req.session) {
@@ -287,37 +322,75 @@ export async function registerRoutes(app: Express): Promise<Server> {
             role: user.role
           };
 
+          console.log("Login successful for:", user.username);
+          
+          // Set cache-control headers
+          res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+          res.setHeader('Pragma', 'no-cache');
+          res.setHeader('Expires', '0');
+          
           return res.json({ user: safeUser });
         });
       })(req, res, next);
     } catch (error) {
+      console.error("Login validation error:", error);
       handleZodError(error, res);
     }
   });
   
   // Logout endpoint
   app.post("/api/logout", (req, res) => {
+    console.log("Logout attempt, authenticated:", req.isAuthenticated());
+    
+    if (req.isAuthenticated()) {
+      const username = (req.user as any)?.username || 'unknown';
+      console.log("Logging out user:", username);
+    }
+    
     req.logout((err) => {
       if (err) {
+        console.error("Logout error:", err);
         return res.status(500).json({ message: "Failed to logout" });
       }
+      
       if (req.session) {
         req.session.destroy((err) => {
           if (err) {
+            console.error("Session destruction error:", err);
             return res.status(500).json({ message: "Failed to destroy session" });
           }
-          res.clearCookie("connect.sid");
+          
+          // Clear the cookie
+          res.clearCookie("connect.sid", { 
+            path: '/',
+            httpOnly: true,
+            secure: false,
+            sameSite: 'lax'
+          });
+          
+          console.log("Logout successful, session destroyed");
           return res.json({ message: "Logged out successfully" });
         });
       } else {
-        res.clearCookie("connect.sid");
+        // Clear the cookie even if no session
+        res.clearCookie("connect.sid", { 
+          path: '/',
+          httpOnly: true,
+          secure: false,
+          sameSite: 'lax'
+        });
+        
+        console.log("Logout successful, no session to destroy");
         return res.json({ message: "Logged out successfully" });
       }
     });
   });
 
   app.get("/api/current-user", (req, res) => {
-    if (!req.user) {
+    console.log("Current user check, authenticated:", req.isAuthenticated());
+    
+    if (!req.isAuthenticated() || !req.user) {
+      console.log("Not authenticated");
       return res.status(401).json({ message: "Not authenticated" });
     }
 
@@ -329,6 +402,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       role: user.role
     };
 
+    console.log("Current user:", safeUser.username);
+    
+    // Set cache-control headers
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    
     res.json({ user: safeUser });
   });
 
@@ -621,6 +701,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(result);
     } catch (error) {
       handleZodError(error, res);
+    }
+  });
+
+  // Logo upload
+  app.post("/api/admin/settings/logo", isAuthenticated, upload.single("logo"), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "Logo file is required" });
+      }
+
+      // Use the correct path for the logo URL
+      const logoUrl = `/uploads/${req.file.filename}`;
+      
+      // Save logo URL to settings with key "company_logo"
+      const result = await storage.upsertSetting({
+        key: "company_logo",
+        value: logoUrl
+      });
+      
+      // Invalidate any cached settings
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+      
+      res.status(201).json({ 
+        message: "Logo uploaded successfully",
+        logoUrl,
+        setting: result
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to upload logo" });
     }
   });
 

@@ -50,8 +50,17 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 
-// Use the simplified product schema
-const extendedProductSchema = insertProductSchema;
+// Update the product schema to remove inStock
+const productSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  description: z.string().optional(),
+  categoryId: z.number().optional(),
+});
+
+// Extended schema that will be used for form validation
+const extendedProductSchema = productSchema.extend({
+  // Remove inStock from the schema
+});
 
 type ProductFormValues = z.infer<typeof extendedProductSchema>;
 

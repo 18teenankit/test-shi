@@ -37,18 +37,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     async function checkAuth() {
       try {
+        setLoading(true);
+        console.log("Checking authentication status...");
+        
         const response = await fetch("/api/current-user", {
+          method: "GET",
           credentials: "include",
+          headers: {
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0"
+          }
         });
         
         if (response.ok) {
           const data = await response.json();
           if (data && data.user) {
+            console.log("User authenticated:", data.user.username);
             setUser(data.user);
+          } else {
+            console.log("No user data in response");
+            setUser(null);
           }
+        } else {
+          console.log("Not authenticated", response.status);
+          setUser(null);
         }
       } catch (error) {
         console.error("Auth check failed:", error);
+        setUser(null);
       } finally {
         setLoading(false);
       }
@@ -60,27 +77,68 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Login function
   const login = async (username: string, password: string) => {
     try {
-      const response = await apiRequest("POST", "/api/login", { username, password });
+      setLoading(true);
+      console.log("Attempting login for:", username);
+      
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": "no-cache, no-store, must-revalidate",
+        },
+        body: JSON.stringify({ username, password }),
+        credentials: "include"
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Login failed");
+      }
+      
       const data = await response.json();
-      setUser(data.user);
+      
+      if (data && data.user) {
+        console.log("Login successful:", data.user.username);
+        setUser(data.user);
+        return; // Successfully logged in
+      } else {
+        throw new Error("Invalid response from server");
+      }
     } catch (error: any) {
       const errorMessage = error.message || "Login failed. Please try again.";
+      console.error("Login error:", errorMessage);
+      
       toast({
         title: "Authentication Error",
         description: errorMessage,
         variant: "destructive",
       });
       throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
   // Logout function
   const logout = async () => {
     try {
-      await apiRequest("POST", "/api/logout", {});
+      console.log("Logging out...");
+      setLoading(true);
+      
+      await fetch("/api/logout", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        }
+      });
+      
+      console.log("Logout successful");
       setUser(null);
     } catch (error) {
       console.error("Logout failed:", error);
+    } finally {
+      setLoading(false);
     }
   };
 

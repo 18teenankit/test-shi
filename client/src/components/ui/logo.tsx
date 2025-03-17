@@ -1,10 +1,18 @@
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 
 interface LogoProps {
   size?: "small" | "medium" | "large";
   className?: string;
 }
+
+type Settings = {
+  company_name?: string;
+  company_tagline?: string;
+  company_logo?: string;
+  [key: string]: string | undefined;
+};
 
 export function Logo({ size = "medium", className }: LogoProps) {
   const dimensions = {
@@ -13,17 +21,47 @@ export function Logo({ size = "medium", className }: LogoProps) {
     large: "h-20",
   };
 
-  // Fetch company name from settings
-  const { data: settings = {} } = useQuery({
+  // Fetch company name from settings with caching disabled
+  const { data: settings = {} as Settings } = useQuery<Settings>({
     queryKey: ["/api/settings"],
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
+    staleTime: 0,
   });
 
   const companyName = settings.company_name || "Shivanshi Enterprises";
   const companyTagline = settings.company_tagline || "Chemicals & Compound Dealers";
+  const companyLogo = settings.company_logo;
 
   // Get first letter for the logo
   const firstLetter = companyName?.charAt(0) || "S";
 
+  const [logoLoadError, setLogoLoadError] = useState(false);
+
+  // If we have an uploaded logo, use it
+  if (companyLogo) {
+    // Add timestamp to prevent caching
+    const logoUrl = `${companyLogo}?t=${new Date().getTime()}`;
+    
+    return (
+      <div className={cn(dimensions[size], "relative", className)}>
+        <img 
+          src={logoUrl} 
+          alt={companyName} 
+          className="h-full w-auto object-contain"
+          onError={(e) => {
+            console.error("Failed to load logo:", logoUrl);
+            // Replace with fallback SVG logo on error
+            e.currentTarget.style.display = 'none';
+            // Force re-render to show SVG logo
+            setLogoLoadError(true);
+          }}
+        />
+      </div>
+    );
+  }
+
+  // Otherwise, use the SVG logo
   return (
     <div className={cn(dimensions[size], "relative", className)}>
       <svg

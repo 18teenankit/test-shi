@@ -11,13 +11,14 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useTheme } from "@/components/ThemeProvider";
-import { Moon, Sun } from "lucide-react";
+import { Moon, Sun, Eye, EyeOff } from "lucide-react";
 
 type FormValues = z.infer<typeof loginSchema>;
 
 export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
   const { login } = useAuth();
   const [_, navigate] = useLocation();
   const { theme, setTheme } = useTheme();
@@ -106,7 +107,26 @@ export default function Login() {
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input type="password" placeholder="Enter your password" {...field} />
+                      <div className="relative">
+                        <Input 
+                          type={showPassword ? "text" : "password"} 
+                          placeholder="Enter your password" 
+                          {...field} 
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                          onClick={() => setShowPassword(!showPassword)}
+                        >
+                          {showPassword ? (
+                            <EyeOff className="h-4 w-4 text-gray-500" />
+                          ) : (
+                            <Eye className="h-4 w-4 text-gray-500" />
+                          )}
+                        </Button>
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>

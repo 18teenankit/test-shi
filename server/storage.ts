@@ -188,15 +188,6 @@ export class MemStorage implements IStorage {
         buttonLink: "/products",
         order: 1,
         isActive: true
-      },
-      { 
-        imageUrl: "https://images.unsplash.com/photo-1581093196277-9f608af9db55",
-        title: "Nationwide Delivery",
-        subtitle: "Fast and reliable shipping across all of India.",
-        buttonText: "Contact Us",
-        buttonLink: "/contact",
-        order: 2,
-        isActive: true
       }
     ];
 
@@ -214,10 +205,14 @@ export class MemStorage implements IStorage {
       this.heroImageCurrentId++;
     });
 
+    // Initialize empty contact requests
+    this.contactRequests = new Map();
+    
     // Default settings
     const defaultSettings = [
       { key: "company_name", value: "Shivanshi Enterprises" },
       { key: "company_tagline", value: "Chemicals & Compound Dealers" },
+      { key: "company_logo", value: "/uploads/logo-shivanshi.png" },
       { key: "company_address", value: "55 2B 9 SANGAM ROAD NAINI INDUSTRIAL AREA PRAYAGRAJ UTTAR PRADESH INDIA- 211008" },
       { key: "company_phone", value: "+91 9418974444" },
       { key: "company_email", value: "shivanshienterprises44@gmail.com" },
@@ -227,7 +222,7 @@ export class MemStorage implements IStorage {
       { key: "social_whatsapp_link", value: "https://wa.me/919418974444" },
       { key: "google_maps_url", value: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3602.9321413865613!2d81.7956!3d25.3503!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjXCsDIxJzAxLjAiTiA4McKwNDcnNDQuMiJF!5e0!3m2!1sen!2sin!4v1615473046844!5m2!1sen!2sin" }
     ];
-
+    
     defaultSettings.forEach(setting => {
       this.settings.set(setting.key, {
         id: this.settingCurrentId++,
@@ -235,6 +230,11 @@ export class MemStorage implements IStorage {
         value: setting.value
       });
     });
+    
+    // Use data from JSON file if it exists
+    if (initialData.users) {
+      // ... existing code ...
+    }
   }
 
   // User methods

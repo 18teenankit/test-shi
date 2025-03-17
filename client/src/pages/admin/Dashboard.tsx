@@ -1,8 +1,8 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { AdminLayout } from "@/components/layouts/AdminLayout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { 
   Package, 
   Layers, 
@@ -14,35 +14,80 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+
+// Define types for our data
+interface Product {
+  id: string;
+  name: string;
+  inStock: boolean;
+  createdAt?: string;
+  categoryId?: string;
+}
+
+interface Category {
+  id: string;
+  name: string;
+}
+
+interface ContactRequest {
+  id: string;
+  name: string;
+  email?: string;
+  status: string;
+}
+
+interface HeroImage {
+  id: string;
+  url: string;
+}
 
 export default function Dashboard() {
   // Fetch stats data
-  const { data: categories, isLoading: categoriesLoading } = useQuery({
+  const { data: categories = [], isLoading: categoriesLoading } = useQuery<Category[]>({
     queryKey: ["/api/categories"],
   });
   
-  const { data: products, isLoading: productsLoading } = useQuery({
+  const { data: products = [], isLoading: productsLoading } = useQuery<Product[]>({
     queryKey: ["/api/products"],
   });
   
-  const { data: heroImages, isLoading: heroImagesLoading } = useQuery({
+  const { data: heroImages = [], isLoading: heroImagesLoading } = useQuery<HeroImage[]>({
     queryKey: ["/api/admin/hero-images"],
   });
-  
-  const { data: contactRequests, isLoading: contactRequestsLoading } = useQuery({
+
+  const { data: contactRequests = [], isLoading: contactRequestsLoading } = useQuery<ContactRequest[]>({
     queryKey: ["/api/admin/contact-requests"],
   });
   
   const isLoading = categoriesLoading || productsLoading || heroImagesLoading || contactRequestsLoading;
-  
+
   // Calculate stats
   const stats = {
-    products: products?.length || 0,
-    categories: categories?.length || 0,
-    heroImages: heroImages?.length || 0,
-    contactRequests: contactRequests?.length || 0,
-    outOfStockProducts: products?.filter((p: any) => !p.inStock).length || 0,
-    newContactRequests: contactRequests?.filter((r: any) => r.status === "new").length || 0
+    products: products.length,
+    categories: categories.length,
+    heroImages: heroImages.length,
+    contactRequests: contactRequests.length,
+    outOfStockProducts: products.filter(p => !p.inStock).length,
+    newContactRequests: contactRequests.filter(r => r.status === "new").length
+  };
+  
+  // Format date function (replacement for dayjs)
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - date.getTime());
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) {
+      return "Today";
+    } else if (diffDays === 1) {
+      return "Yesterday";
+    } else if (diffDays < 7) {
+      return `${diffDays} days ago`;
+    } else {
+      return date.toLocaleDateString();
+    }
   };
   
   const StatCard = ({ 
@@ -77,14 +122,14 @@ export default function Dashboard() {
       </CardContent>
     </Card>
   );
-  
+
   return (
     <AdminLayout>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold">Dashboard</h1>
         </div>
-        
+
         <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard 
             title="Total Products" 
@@ -160,7 +205,7 @@ export default function Dashboard() {
                     </AlertDescription>
                   </Alert>
                 )}
-                
+
                 {stats.outOfStockProducts === 0 && stats.newContactRequests === 0 && (
                   <Alert variant="default" className="border-green-200 dark:border-green-800">
                     <CheckCircle className="h-4 w-4 text-green-500" />
@@ -196,14 +241,14 @@ export default function Dashboard() {
                   </Link>
                 </div>
                 
-                {!isLoading && products && products.length > 0 && (
+                {!isLoading && products.length > 0 && (
                   <Card>
                     <CardHeader>
                       <CardTitle className="text-sm">Latest Products</CardTitle>
                     </CardHeader>
                     <CardContent className="p-0">
                       <ul className="divide-y">
-                        {products.slice(0, 3).map((product: any) => (
+                        {products.slice(0, 3).map((product) => (
                           <li key={product.id} className="p-3 flex items-center justify-between">
                             <span className="truncate max-w-[200px]">{product.name}</span>
                             <div className="flex items-center">
@@ -252,14 +297,14 @@ export default function Dashboard() {
                   </Link>
                 </div>
                 
-                {!isLoading && contactRequests && contactRequests.length > 0 && (
+                {!isLoading && contactRequests.length > 0 && (
                   <Card>
                     <CardHeader>
                       <CardTitle className="text-sm">Recent Contact Requests</CardTitle>
                     </CardHeader>
                     <CardContent className="p-0">
                       <ul className="divide-y">
-                        {contactRequests.slice(0, 3).map((request: any) => (
+                        {contactRequests.slice(0, 3).map((request) => (
                           <li key={request.id} className="p-3 flex items-center justify-between">
                             <span className="truncate max-w-[200px]">{request.name}</span>
                             <div className="flex items-center">

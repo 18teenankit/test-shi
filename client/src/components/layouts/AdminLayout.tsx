@@ -80,171 +80,156 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     navItems.push({ href: "/admin/users", label: "Users", icon: <Users className="h-5 w-5 mr-2" /> });
   }
   
-  const NavLink = ({ href, label, icon }: { href: string; label: string; icon: React.ReactNode }) => {
-    const isActive = location === href;
-    
-    return (
-      <Link href={href}>
-        <a
-          className={`flex items-center px-4 py-2 rounded-md transition-colors ${
-            isActive
-              ? "bg-primary text-white"
-              : "hover:bg-secondary"
-          }`}
-        >
-          {icon}
-          {label}
-        </a>
-      </Link>
-    );
-  };
-  
   return (
-    <div className="flex min-h-screen bg-background">
-      {/* Desktop Sidebar */}
-      {!isMobile && (
-        <div className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0">
-          <div className="flex flex-col flex-grow pt-5 bg-card border-r overflow-y-auto">
-            <div className="flex items-center justify-center h-16">
-              <Logo size="small" />
-              <span className="text-xl font-bold ml-2">Admin Panel</span>
-            </div>
-            
-            <div className="mt-5 flex-1 flex flex-col">
-              <nav className="flex-1 px-2 space-y-1">
-                {navItems.map((item) => (
-                  <NavLink key={item.href} {...item} />
-                ))}
-              </nav>
-            </div>
-            
-            <div className="p-4 border-t">
-              <Button
-                variant="outline"
-                className="w-full justify-start"
-                onClick={handleLogout}
-              >
-                <LogOut className="h-5 w-5 mr-2" />
-                Logout
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
-      
-      {/* Mobile Sidebar */}
-      {isMobile && (
-        <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-          <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" className="md:hidden">
-              <Menu className="h-6 w-6" />
-              <span className="sr-only">Open menu</span>
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="left" className="w-[300px] sm:w-[400px]">
-            <div className="flex flex-col h-full">
-              <div className="flex items-center h-16">
-                <Logo size="small" />
-                <span className="text-xl font-bold ml-2">Admin Panel</span>
-              </div>
-              
-              <nav className="flex-1 mt-5 space-y-1">
-                {navItems.map((item) => (
-                  <NavLink key={item.href} {...item} />
-                ))}
-              </nav>
-              
-              <div className="p-4 border-t mt-auto">
-                <Button
-                  variant="outline"
-                  className="w-full justify-start"
-                  onClick={handleLogout}
-                >
-                  <LogOut className="h-5 w-5 mr-2" />
-                  Logout
-                </Button>
-              </div>
-            </div>
-          </SheetContent>
-        </Sheet>
-      )}
-      
-      {/* Main Content */}
-      <div className={`flex flex-col flex-1 ${!isMobile ? "md:pl-64" : ""}`}>
-        {/* Top Navigation */}
-        <header className="sticky top-0 z-10 flex-shrink-0 h-16 bg-white dark:bg-card shadow-md">
-          <div className="px-4 flex items-center justify-between h-full">
-            {/* Mobile Menu Button */}
-            {isMobile && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsSheetOpen(true)}
-              >
-                <Menu className="h-6 w-6" />
-                <span className="sr-only">Open menu</span>
-              </Button>
-            )}
-            
-            <div className="flex-1 flex justify-center md:justify-start">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
+      {/* Top Bar */}
+      <header className="border-b bg-white dark:bg-gray-800 sticky top-0 z-10">
+        <div className="container mx-auto px-4">
+          <div className="py-4 flex items-center justify-between">
+            <div className="flex items-center">
               {isMobile && (
-                <h1 className="text-xl font-semibold">
-                  Admin Panel
-                </h1>
+                <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+                  <SheetTrigger asChild>
+                    <Button variant="ghost" size="icon" className="mr-2">
+                      <Menu className="h-5 w-5" />
+                      <span className="sr-only">Toggle menu</span>
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="left" className="w-[250px] sm:w-[300px] p-0">
+                    <div className="flex flex-col h-full">
+                      <div className="border-b py-4 px-4">
+                        <Logo size="small" />
+                      </div>
+                      
+                      <div className="flex-1 overflow-auto py-2">
+                        <nav className="space-y-1 px-2">
+                          {navItems.map((item) => (
+                            <Link 
+                              key={item.href} 
+                              href={item.href}
+                              className={`flex items-center px-2 py-2 text-sm rounded-md ${
+                                location === item.href
+                                  ? 'bg-primary text-white font-medium'
+                                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                              }`}
+                            >
+                              {item.icon}
+                              {item.label}
+                            </Link>
+                          ))}
+                        </nav>
+                      </div>
+                      
+                      <div className="border-t p-4 flex flex-col gap-2">
+                        <Button 
+                          variant="outline" 
+                          className="justify-start text-sm font-normal w-full"
+                          onClick={toggleTheme}
+                        >
+                          {theme === 'dark' ? (
+                            <Sun className="h-4 w-4 mr-2" />
+                          ) : (
+                            <Moon className="h-4 w-4 mr-2" />
+                          )}
+                          {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+                        </Button>
+                        
+                        <Button 
+                          variant="outline"
+                          className="justify-start text-sm font-normal text-red-500 w-full"
+                          onClick={handleLogout}
+                        >
+                          <LogOut className="h-4 w-4 mr-2" />
+                          Logout
+                        </Button>
+                      </div>
+                    </div>
+                  </SheetContent>
+                </Sheet>
               )}
+              
+              <Link href="/admin" className="flex items-center">
+                <Logo size="small" />
+                <span className="ml-2 font-semibold text-lg hidden sm:inline-block">Admin Panel</span>
+              </Link>
             </div>
             
-            <div className="flex items-center space-x-4">
-              {/* Theme Toggle */}
-              <Button
-                variant="ghost"
+            <div className="flex items-center space-x-2">
+              <Button 
+                variant="ghost" 
                 size="icon"
                 onClick={toggleTheme}
-                aria-label="Toggle theme"
+                className="rounded-full h-8 w-8 p-0 flex items-center justify-center"
               >
-                {theme === "light" ? (
-                  <Moon className="h-5 w-5" />
-                ) : (
+                {theme === 'dark' ? (
                   <Sun className="h-5 w-5" />
+                ) : (
+                  <Moon className="h-5 w-5" />
                 )}
+                <span className="sr-only">Toggle theme</span>
               </Button>
               
-              {/* User Menu */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon">
+                  <Button variant="ghost" size="icon" className="rounded-full h-8 w-8 p-0">
                     <User className="h-5 w-5" />
                     <span className="sr-only">User menu</span>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>
+                    <div className="flex flex-col">
+                      <span>{user.username}</span>
+                      <span className="text-xs text-muted-foreground">{user.role}</span>
+                    </div>
+                  </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    <span className="text-sm text-muted-foreground">
-                      Logged in as <strong>{user.username}</strong>
-                    </span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <span className="text-sm text-muted-foreground">
-                      Role: <strong>{user.role}</strong>
-                    </span>
+                  <DropdownMenuItem asChild>
+                    <Link href="/admin/settings" className="cursor-pointer w-full">
+                      <Settings className="h-4 w-4 mr-2" />
+                      <span>Settings</span>
+                    </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout}>
+                  <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-red-500">
                     <LogOut className="h-4 w-4 mr-2" />
-                    Logout
+                    <span>Logout</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
           </div>
-        </header>
+        </div>
+      </header>
+      
+      {/* Main Content */}
+      <div className="flex-1 flex">
+        {/* Sidebar (desktop only) */}
+        {!isMobile && (
+          <div className="w-64 border-r bg-white dark:bg-gray-800 h-[calc(100vh-4rem)] sticky top-16 overflow-y-auto">
+            <nav className="space-y-1 p-4">
+              {navItems.map((item) => (
+                <Link 
+                  key={item.href} 
+                  href={item.href}
+                  className={`flex items-center px-3 py-2 text-sm rounded-md ${
+                    location === item.href
+                      ? 'bg-primary text-white font-medium'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  {item.icon}
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
+          </div>
+        )}
         
-        {/* Content Area */}
-        <main className="flex-1 p-6">
+        {/* Main Content */}
+        <div className="flex-1 p-4 sm:p-6 overflow-auto">
           {children}
-        </main>
+        </div>
       </div>
     </div>
   );

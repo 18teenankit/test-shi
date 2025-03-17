@@ -5,9 +5,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertSettingSchema } from "@shared/schema";
 import { z } from "zod";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, invalidateSettingsCache } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Save, Building, Phone, Mail, Clock, GithubIcon, Instagram, Facebook, Linkedin, Map } from "lucide-react";
+import { Save, Building, Phone, Mail, Clock, GithubIcon, Instagram, Facebook, Linkedin, Map, Image } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -15,6 +15,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
+import { FileUpload } from "@/components/ui/file-upload";
 
 type SettingFormValues = z.infer<typeof insertSettingSchema>;
 
@@ -69,6 +70,65 @@ export default function Settings() {
       value: ""
     },
   });
+  
+  // Logo upload state
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  
+  // Logo upload mutation
+  const uploadLogoMutation = useMutation({
+    mutationFn: async (file: File) => {
+      const formData = new FormData();
+      formData.append("logo", file);
+      
+      const response = await fetch("/api/admin/settings/logo", {
+        method: "POST",
+        body: formData,
+        credentials: "include"
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to upload logo");
+      }
+      
+      return await response.json();
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/settings"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/settings"] });
+      invalidateSettingsCache();
+      toast({
+        title: "Logo updated",
+        description: "Company logo has been updated successfully.",
+      });
+      setLogoFile(null);
+      
+      // Force reload the image by adding a timestamp
+      if (settingsObj.company_logo) {
+        const img = new Image();
+        img.src = `${settingsObj.company_logo}?t=${new Date().getTime()}`;
+      }
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Failed to upload logo",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+  
+  const handleLogoUpload = () => {
+    if (logoFile) {
+      uploadLogoMutation.mutate(logoFile);
+    } else {
+      toast({
+        title: "No file selected",
+        description: "Please select a logo image file to upload.",
+        variant: "destructive",
+      });
+    }
+  };
   
   // Update forms when settings are loaded
   useState(() => {
@@ -181,26 +241,32 @@ export default function Settings() {
           </TabsList>
           
           {/* Company Info Tab */}
-          <TabsContent value="company">
+          <TabsContent value="company" className="space-y-4">
             <Card>
               <CardHeader>
                 <CardTitle>Company Information</CardTitle>
                 <CardDescription>
-                  Update your company's basic information that appears on the website.
+                  Update your company's basic information that will be displayed throughout the website.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {isLoading ? (
-                  <Skeleton className="h-24 w-full" />
+                  <div className="space-y-3">
+                    <Skeleton className="h-10 w-full" />
+                    <Skeleton className="h-10 w-full" />
+                  </div>
                 ) : (
                   <Form {...companyForm}>
-                    <form className="space-y-4">
+                    <div className="space-y-4">
                       <FormField
                         control={companyForm.control}
                         name="value"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Company Name</FormLabel>
+                            <FormLabel className="flex items-center">
+                              <Building className="h-4 w-4 mr-2" />
+                              Company Name
+                            </FormLabel>
                             <FormControl>
                               <div className="flex space-x-2">
                                 <Input 
@@ -218,16 +284,90 @@ export default function Settings() {
                                 </Button>
                               </div>
                             </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={companyForm.control}
+                        name="company_tagline"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="flex items-center">
+                              <Building className="h-4 w-4 mr-2" />
+                              Company Tagline
+                            </FormLabel>
+                            <FormControl>
+                              <div className="flex space-x-2">
+                                <Input 
+                                  placeholder="Enter company tagline"
+                                  defaultValue={settingsObj.company_tagline || ""}
+                                  {...field}
+                                />
+                                <Button
+                                  type="button"
+                                  onClick={() => saveSetting("company_tagline", field.value)}
+                                  disabled={updateSettingMutation.isPending}
+                                >
+                                  <Save className="h-4 w-4 mr-2" />
+                                  Save
+                                </Button>
+                              </div>
+                            </FormControl>
                             <FormDescription>
-                              This name will appear in the header, footer, and other places on the website.
+                              A short tagline or slogan for your company. This appears below the logo in some places.
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
                       
-                      {/* Additional company settings can be added here */}
-                    </form>
+                      <div className="border rounded-lg p-4 space-y-4">
+                        <FormItem>
+                          <FormLabel className="flex items-center">
+                            <Image className="h-4 w-4 mr-2" />
+                            Company Logo
+                          </FormLabel>
+                          <FormControl>
+                            <div className="space-y-4">
+                              {settingsObj.company_logo && (
+                                <div className="p-4 border rounded-lg bg-gray-50 dark:bg-gray-900">
+                                  <div className="text-sm text-gray-500 dark:text-gray-400 mb-2">Current Logo:</div>
+                                  <img 
+                                    src={settingsObj.company_logo} 
+                                    alt="Company Logo" 
+                                    className="max-h-24"
+                                  />
+                                </div>
+                              )}
+                              
+                              <FileUpload
+                                id="company-logo"
+                                accept="image/*"
+                                onChange={setLogoFile}
+                                value={logoFile}
+                              />
+                              
+                              <Button
+                                type="button"
+                                onClick={handleLogoUpload}
+                                disabled={uploadLogoMutation.isPending || !logoFile}
+                                className="mt-2"
+                              >
+                                <Save className="h-4 w-4 mr-2" />
+                                {uploadLogoMutation.isPending ? "Uploading..." : "Upload Logo"}
+                              </Button>
+                            </div>
+                          </FormControl>
+                          <FormDescription>
+                            Upload your company logo. This will be displayed in the header, footer, and admin panel.
+                            Recommended size: 200x200px. Supported formats: PNG, JPG, SVG.
+                          </FormDescription>
+                        </FormItem>
+                      </div>
+                      
+                    </div>
                   </Form>
                 )}
               </CardContent>
@@ -235,7 +375,7 @@ export default function Settings() {
           </TabsContent>
           
           {/* Contact Details Tab */}
-          <TabsContent value="contact">
+          <TabsContent value="contact" className="space-y-4">
             <Card>
               <CardHeader>
                 <CardTitle>Contact Information</CardTitle>
@@ -389,7 +529,7 @@ export default function Settings() {
           </TabsContent>
           
           {/* Social Media Tab */}
-          <TabsContent value="social">
+          <TabsContent value="social" className="space-y-4">
             <Card>
               <CardHeader>
                 <CardTitle>Social Media Links</CardTitle>
@@ -550,7 +690,7 @@ export default function Settings() {
           </TabsContent>
           
           {/* Google Maps Tab */}
-          <TabsContent value="maps">
+          <TabsContent value="maps" className="space-y-4">
             <Card>
               <CardHeader>
                 <CardTitle>Google Maps Integration</CardTitle>

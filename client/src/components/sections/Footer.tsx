@@ -125,7 +125,6 @@ export function Footer({}: FooterProps) {
                   </Link>
                 </li>
               ))}
-              
             </ul>
           </div>
           

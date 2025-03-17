@@ -55,3 +55,8 @@ export const queryClient = new QueryClient({
     },
   },
 });
+
+// Add a function to invalidate settings cache
+export function invalidateSettingsCache() {
+  queryClient.invalidateQueries({ queryKey: ["/api/settings"] });
+}
