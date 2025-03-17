@@ -24,11 +24,13 @@ import {
   Menu,
   Moon,
   Sun,
-  User
+  User,
+  Loader
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useMobile } from "@/hooks/use-mobile";
 import { Logo } from "@/components/ui/logo";
+import { useToast } from "@/hooks/use-toast";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -36,28 +38,90 @@ interface AdminLayoutProps {
 
 export function AdminLayout({ children }: AdminLayoutProps) {
   const { theme, setTheme } = useTheme();
-  const { user, logout } = useAuth();
+  const { user, logout, loading, refreshSession } = useAuth();
   const [location, navigate] = useLocation();
   const isMobile = useMobile();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [authChecking, setAuthChecking] = useState(true);
+  const [authRetries, setAuthRetries] = useState(0);
+  const { toast } = useToast();
   
   useEffect(() => {
     // Close mobile sidebar when route changes
     setIsSheetOpen(false);
   }, [location]);
   
+  // Enhanced authentication check with retry mechanism
+  useEffect(() => {
+    const MAX_RETRIES = 3;
+    let timeoutId: NodeJS.Timeout;
+    
+    // Only run this effect if the main auth loading is complete
+    if (!loading) {
+      if (!user && authRetries < MAX_RETRIES) {
+        // If no user after auth loading finished, wait briefly and retry
+        setAuthChecking(true);
+        timeoutId = setTimeout(async () => {
+          try {
+            console.log(`Auth retry attempt ${authRetries + 1} of ${MAX_RETRIES}`);
+            await refreshSession();
+            setAuthRetries(prev => prev + 1);
+          } finally {
+            setAuthChecking(false);
+          }
+        }, 1000); // Wait 1 second before retry
+      } else {
+        setAuthChecking(false);
+      }
+    }
+    
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, [user, loading, authRetries, refreshSession]);
+  
+  // Redirect to login if not authenticated after retries
+  useEffect(() => {
+    if (!loading && !authChecking && !user && authRetries > 0) {
+      console.log("Not authenticated after retries, redirecting to login");
+      navigate("/admin/login");
+    }
+  }, [loading, authChecking, user, authRetries, navigate]);
+  
+  // Show loading state while checking auth
+  if (loading || authChecking) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-center">
+          <Loader className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
+          <p className="text-gray-600 dark:text-gray-400">
+            Verifying your session...
+          </p>
+        </div>
+      </div>
+    );
+  }
+  
+  // If still checking or not authenticated, don't render admin content
   if (!user) {
-    // Redirect to login if not authenticated
-    navigate("/admin/login");
     return null;
   }
   
   const handleLogout = async () => {
     try {
       await logout();
+      toast({
+        title: "Logged out",
+        description: "You have been logged out successfully.",
+      });
       navigate("/admin/login");
     } catch (error) {
       console.error("Logout failed:", error);
+      toast({
+        title: "Logout Failed",
+        description: "There was a problem logging out. Please try again.",
+        variant: "destructive",
+      });
     }
   };
   

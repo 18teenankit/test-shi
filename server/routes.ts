@@ -48,7 +48,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     session({
       secret: process.env.SESSION_SECRET || "shivanshi-enterprises-secret",
       resave: false,
-      saveUninitialized: true,
+      saveUninitialized: false,
       cookie: { 
         maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
         secure: false,

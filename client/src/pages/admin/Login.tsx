@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLocation } from "wouter";
@@ -19,9 +19,17 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
-  const { login } = useAuth();
+  const { login, user, loading } = useAuth();
   const [_, navigate] = useLocation();
   const { theme, setTheme } = useTheme();
+  
+  // If already authenticated, redirect to admin dashboard
+  useEffect(() => {
+    if (user && !loading) {
+      console.log("User already authenticated, redirecting to admin dashboard");
+      navigate("/admin");
+    }
+  }, [user, loading, navigate]);
   
   const form = useForm<FormValues>({
     resolver: zodResolver(loginSchema),
@@ -37,6 +45,8 @@ export default function Login() {
     
     try {
       await login(data.username, data.password);
+      // Store login timestamp in localStorage to track session age
+      localStorage.setItem('admin_last_login', Date.now().toString());
       navigate("/admin");
     } catch (error: any) {
       setErrorMessage(error.message || "Login failed. Please try again.");
@@ -48,7 +58,24 @@ export default function Login() {
   const toggleTheme = () => {
     setTheme(theme === "light" ? "dark" : "light");
   };
+
+  // Show loading indicator while checking authentication status
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">Checking session...</p>
+        </div>
+      </div>
+    );
+  }
   
+  // Don't render login form if already authenticated
+  if (user) {
+    return null;
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
       <div className="absolute top-4 right-4">

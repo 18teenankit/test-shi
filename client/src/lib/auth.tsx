@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
@@ -16,6 +16,7 @@ interface AuthContextType {
   logout: () => void;
   isAuthenticated: boolean;
   isSuperAdmin: boolean;
+  refreshSession: () => Promise<void>;
 }
 
 // Create context with default values
@@ -26,53 +27,92 @@ const AuthContext = createContext<AuthContextType>({
   logout: () => {},
   isAuthenticated: false,
   isSuperAdmin: false,
+  refreshSession: async () => {},
 });
+
+// Session polling interval (in milliseconds)
+const SESSION_CHECK_INTERVAL = 5 * 60 * 1000; // 5 minutes
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
+  // Function to check authentication status
+  const checkAuth = useCallback(async (showErrors = false) => {
+    try {
+      console.log("Checking authentication status...");
+      
+      const response = await fetch("/api/current-user", {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Cache-Control": "no-cache, no-store, must-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0"
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data && data.user) {
+          console.log("User authenticated:", data.user.username);
+          setUser(data.user);
+          return true;
+        } else {
+          console.log("No user data in response");
+          setUser(null);
+          return false;
+        }
+      } else {
+        console.log("Not authenticated", response.status);
+        setUser(null);
+        return false;
+      }
+    } catch (error) {
+      console.error("Auth check failed:", error);
+      if (showErrors) {
+        toast({
+          title: "Session Error",
+          description: "Failed to verify your session. Please try refreshing the page.",
+          variant: "destructive",
+        });
+      }
+      setUser(null);
+      return false;
+    }
+  }, [toast]);
+
+  // Function to refresh the session explicitly
+  const refreshSession = useCallback(async () => {
+    setLoading(true);
+    await checkAuth(true);
+    setLoading(false);
+  }, [checkAuth]);
+
   // Check if user is authenticated on component mount
   useEffect(() => {
-    async function checkAuth() {
-      try {
-        setLoading(true);
-        console.log("Checking authentication status...");
-        
-        const response = await fetch("/api/current-user", {
-          method: "GET",
-          credentials: "include",
-          headers: {
-            "Cache-Control": "no-cache, no-store, must-revalidate",
-            "Pragma": "no-cache",
-            "Expires": "0"
-          }
-        });
-        
-        if (response.ok) {
-          const data = await response.json();
-          if (data && data.user) {
-            console.log("User authenticated:", data.user.username);
-            setUser(data.user);
-          } else {
-            console.log("No user data in response");
-            setUser(null);
-          }
-        } else {
-          console.log("Not authenticated", response.status);
-          setUser(null);
-        }
-      } catch (error) {
-        console.error("Auth check failed:", error);
-        setUser(null);
-      } finally {
-        setLoading(false);
-      }
+    async function initialAuthCheck() {
+      setLoading(true);
+      await checkAuth();
+      setLoading(false);
     }
     
-    checkAuth();
-  }, []);
+    initialAuthCheck();
+  }, [checkAuth]);
+
+  // Set up periodic session check
+  useEffect(() => {
+    // Only set up polling if the user is authenticated
+    if (!user) return;
+
+    const intervalId = setInterval(() => {
+      checkAuth();
+    }, SESSION_CHECK_INTERVAL);
+
+    // Clean up on unmount
+    return () => clearInterval(intervalId);
+  }, [user, checkAuth]);
 
   // Login function
   const login = async (username: string, password: string) => {
@@ -100,6 +140,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (data && data.user) {
         console.log("Login successful:", data.user.username);
         setUser(data.user);
+        // After login, ensure we have the latest session cookie
+        document.cookie = document.cookie;
         return; // Successfully logged in
       } else {
         throw new Error("Invalid response from server");
@@ -153,6 +195,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     logout,
     isAuthenticated,
     isSuperAdmin,
+    refreshSession,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

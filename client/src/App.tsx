@@ -1,8 +1,9 @@
-import { Switch, Route, useLocation } from "wouter";
+import { Switch, Route, useLocation, Redirect } from "wouter";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { useAuth } from "@/lib/auth";
 
 // Public pages
 import Home from "@/pages/Home";
@@ -27,6 +28,24 @@ import Users from "@/pages/admin/Users";
 // Auth providers
 import { AuthProvider } from "@/lib/auth";
 
+// Protected route component for admin routes
+function AdminRoute({ component: Component, ...rest }: { component: React.ComponentType<any>, path: string }) {
+  const { user, loading } = useAuth();
+  const [, navigate] = useLocation();
+  
+  // If loading, return null (AdminLayout will handle loading state)
+  if (loading) return null;
+  
+  // If not authenticated and not loading, redirect to login
+  if (!user && !loading) {
+    // Redirect to login page
+    return <Redirect to="/admin/login" />;
+  }
+  
+  // Render the component if authenticated
+  return <Route {...rest} component={Component} />;
+}
+
 function App() {
   const [location] = useLocation();
   const isAdmin = location.startsWith("/admin");
@@ -45,15 +64,17 @@ function App() {
             <Route path="/products" component={Products} /> {/* Added route */}
             <Route path="/category/:id" component={CategoryProducts} /> {/* Added route */}
 
-            {/* Admin Routes */}
-            <Route path="/admin" component={Dashboard} />
+            {/* Login route (special case) */}
             <Route path="/admin/login" component={Login} />
-            <Route path="/admin/products" component={ProductsAdmin} />
-            <Route path="/admin/categories" component={Categories} />
-            <Route path="/admin/hero-images" component={HeroImages} />
-            <Route path="/admin/contact-requests" component={ContactRequests} />
-            <Route path="/admin/settings" component={Settings} />
-            <Route path="/admin/users" component={Users} />
+
+            {/* Protected Admin Routes */}
+            <AdminRoute path="/admin" component={Dashboard} />
+            <AdminRoute path="/admin/products" component={ProductsAdmin} />
+            <AdminRoute path="/admin/categories" component={Categories} />
+            <AdminRoute path="/admin/hero-images" component={HeroImages} />
+            <AdminRoute path="/admin/contact-requests" component={ContactRequests} />
+            <AdminRoute path="/admin/settings" component={Settings} />
+            <AdminRoute path="/admin/users" component={Users} />
 
             {/* Fallback to 404 */}
             <Route component={NotFound} />
