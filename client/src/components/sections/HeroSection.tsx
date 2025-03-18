@@ -3,12 +3,23 @@ import { Link } from "wouter";
 import { HeroCarousel } from "@/components/ui/carousel-custom";
 import { Skeleton } from "@/components/ui/skeleton";
 
+// Define interface for hero image data
+interface HeroImage {
+  imageUrl: string;
+  title: string | null;
+  subtitle: string | null;
+  buttonText: string | null;
+  buttonLink: string | null;
+  order: number | null;
+  isActive: boolean | null;
+}
+
 interface HeroSectionProps {
   language?: "en" | "hi";
 }
 
 export function HeroSection({ language = "en" }: HeroSectionProps) {
-  const { data: heroImages, isLoading } = useQuery({
+  const { data: heroImages, isLoading } = useQuery<HeroImage[]>({
     queryKey: ["/api/hero-images"],
   });
   
@@ -39,7 +50,7 @@ export function HeroSection({ language = "en" }: HeroSectionProps) {
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <a 
-                  href="https://wa.me/919418974444" 
+                  href="https://wa.me/911234567890" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="inline-block bg-green-600 hover:bg-green-700 text-white font-medium px-6 py-3 rounded-lg transition-colors text-center"
@@ -56,12 +67,12 @@ export function HeroSection({ language = "en" }: HeroSectionProps) {
   
   return (
     <HeroCarousel
-      slides={heroImages.map((image: any) => ({
+      slides={heroImages.map((image: HeroImage) => ({
         imageUrl: image.imageUrl,
-        title: image.title,
-        subtitle: image.subtitle,
-        buttonText: image.buttonText,
-        buttonLink: image.buttonLink
+        title: image.title || undefined,
+        subtitle: image.subtitle || undefined,
+        buttonText: image.buttonText || undefined,
+        buttonLink: image.buttonLink || undefined
       }))}
     />
   );

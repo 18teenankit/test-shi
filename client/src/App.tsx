@@ -4,6 +4,7 @@ import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { useAuth } from "@/lib/auth";
+import { HelmetProvider } from "react-helmet-async";
 
 // Public pages
 import Home from "@/pages/Home";
@@ -55,42 +56,44 @@ function App() {
   const isAdmin = location.startsWith("/admin");
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <AuthProvider>
-          <Switch>
-            {/* Public Routes */}
-            <Route path="/" component={Home} />
-            <Route path="/about" component={About} />
-            <Route path="/contact" component={Contact} />
-            <Route path="/category/:id" component={ProductCategory} />
-            <Route path="/product/:id" component={ProductDetail} />
-            <Route path="/products" component={Products} /> {/* Added route */}
-            <Route path="/category/:id" component={CategoryProducts} /> {/* Added route */}
-            
-            {/* Legal Routes */}
-            <Route path="/privacy" component={Privacy} />
-            <Route path="/terms" component={Terms} />
+    <HelmetProvider>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider>
+          <AuthProvider>
+            <Switch>
+              {/* Public Routes */}
+              <Route path="/" component={Home} />
+              <Route path="/about" component={About} />
+              <Route path="/contact" component={Contact} />
+              <Route path="/category/:id" component={ProductCategory} />
+              <Route path="/product/:id" component={ProductDetail} />
+              <Route path="/products" component={Products} /> {/* Added route */}
+              <Route path="/category/:id" component={CategoryProducts} /> {/* Added route */}
+              
+              {/* Legal Routes */}
+              <Route path="/privacy" component={Privacy} />
+              <Route path="/terms" component={Terms} />
 
-            {/* Login route (special case) */}
-            <Route path="/admin/login" component={Login} />
+              {/* Login route (special case) */}
+              <Route path="/admin/login" component={Login} />
 
-            {/* Protected Admin Routes */}
-            <AdminRoute path="/admin" component={Dashboard} />
-            <AdminRoute path="/admin/products" component={ProductsAdmin} />
-            <AdminRoute path="/admin/categories" component={Categories} />
-            <AdminRoute path="/admin/hero-images" component={HeroImages} />
-            <AdminRoute path="/admin/contact-requests" component={ContactRequests} />
-            <AdminRoute path="/admin/settings" component={Settings} />
-            <AdminRoute path="/admin/users" component={Users} />
+              {/* Protected Admin Routes */}
+              <AdminRoute path="/admin" component={Dashboard} />
+              <AdminRoute path="/admin/products" component={ProductsAdmin} />
+              <AdminRoute path="/admin/categories" component={Categories} />
+              <AdminRoute path="/admin/hero-images" component={HeroImages} />
+              <AdminRoute path="/admin/contact-requests" component={ContactRequests} />
+              <AdminRoute path="/admin/settings" component={Settings} />
+              <AdminRoute path="/admin/users" component={Users} />
 
-            {/* Fallback to 404 */}
-            <Route component={NotFound} />
-          </Switch>
-        </AuthProvider>
-        <Toaster />
-      </ThemeProvider>
-    </QueryClientProvider>
+              {/* Fallback to 404 */}
+              <Route component={NotFound} />
+            </Switch>
+          </AuthProvider>
+          <Toaster />
+        </ThemeProvider>
+      </QueryClientProvider>
+    </HelmetProvider>
   );
 }
 

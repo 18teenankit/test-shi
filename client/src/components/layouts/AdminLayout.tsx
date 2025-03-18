@@ -63,7 +63,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
         setAuthChecking(true);
         timeoutId = setTimeout(async () => {
           try {
-            console.log(`Auth retry attempt ${authRetries + 1} of ${MAX_RETRIES}`);
+            // Attempt to refresh the session - retry authentication
             await refreshSession();
             setAuthRetries(prev => prev + 1);
           } finally {
@@ -83,7 +83,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   // Redirect to login if not authenticated after retries
   useEffect(() => {
     if (!loading && !authChecking && !user && authRetries > 0) {
-      console.log("Not authenticated after retries, redirecting to login");
+      // Authentication failed after multiple retries, redirect to login
       navigate("/admin/login");
     }
   }, [loading, authChecking, user, authRetries, navigate]);

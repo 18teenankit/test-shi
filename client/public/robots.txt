@@ -1,0 +1,10 @@
+# Allow all web crawlers
+User-agent: *
+Allow: /
+
+# Disallow admin routes
+Disallow: /admin/
+Disallow: /admin/*
+
+# Sitemap location
+Sitemap: https://shivanshienterprises.in/sitemap.xml 

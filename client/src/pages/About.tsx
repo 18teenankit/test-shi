@@ -4,6 +4,7 @@ import { CTASection } from "@/components/sections/CTASection";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { CheckCircle } from "lucide-react";
+import Head from "@/components/SEO/Head";
 
 export default function About() {
   const [language, setLanguage] = useState<"en" | "hi">("en");
@@ -68,9 +69,49 @@ export default function About() {
   };
   
   const currentContent = language === "en" ? content.en : content.hi;
+
+  // Create structured data for Organization
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Shivanshi Enterprises",
+    "description": currentContent.intro,
+    "url": "https://shivanshienterprises.in/about",
+    "logo": "https://shivanshienterprises.in/uploads/logo-1742233935605-1ec8d0e89d22.jpg",
+    "sameAs": [
+      "https://www.facebook.com/shivanshienterprises",
+      "https://www.linkedin.com/company/shivanshi-enterprises"
+    ],
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "55 2B 9 SANGAM ROAD NAINI INDUSTRIAL AREA",
+      "addressLocality": "PRAYAGRAJ",
+      "addressRegion": "UTTAR PRADESH",
+      "postalCode": "211008",
+      "addressCountry": "INDIA"
+    },
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "telephone": "+91 1234567890",
+      "contactType": "customer service",
+      "email": "shivanshienterprises44@gmail.com"
+    }
+  };
   
   return (
     <Layout>
+      {/* SEO Meta Tags */}
+      <Head 
+        title={`${currentContent.title} | Shivanshi Enterprises`}
+        description={`${currentContent.intro} Learn about our mission, vision, values, and commitment to quality and safety. Your trusted chemical supplier in India.`}
+        keywords="chemical supplier, compounds manufacturer, high-quality chemicals, chemical distributor, chemical supply company India, Shivanshi Enterprises, about chemicals company"
+        canonicalUrl="/about"
+        ogTitle={`${currentContent.title} | Shivanshi Enterprises`}
+        ogDescription={currentContent.intro}
+        ogType="website"
+        structuredData={structuredData}
+      />
+
       <div className="py-16 bg-gray-50 dark:bg-gray-800">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center mb-12">

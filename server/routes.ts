@@ -262,11 +262,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/login", (req, res, next) => {
     try {
       const loginData = loginSchema.parse(req.body);
-      console.log("Login attempt for:", loginData.username);
+      // Just log attempt without username for security
+      console.log("Login attempt received");
 
       // Check if user is already authenticated
       if (req.isAuthenticated()) {
-        console.log("User already authenticated");
         // If already authenticated, return the current user
         if (req.user) {
           const user = req.user as any;
@@ -290,18 +290,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       passport.authenticate("local", (err, user, info) => {
         if (err) {
-          console.error("Authentication error:", err);
           return next(err);
         }
         
         if (!user) {
-          console.log("Authentication failed:", info.message);
           return res.status(401).json({ message: info.message });
         }
 
         req.logIn(user, (err) => {
           if (err) {
-            console.error("Login error:", err);
             return next(err);
           }
 
@@ -321,8 +318,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
             username: user.username,
             role: user.role
           };
-
-          console.log("Login successful for:", user.username);
           
           // Set cache-control headers
           res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
@@ -340,57 +335,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Logout endpoint
   app.post("/api/logout", (req, res) => {
-    console.log("Logout attempt, authenticated:", req.isAuthenticated());
-    
     if (req.isAuthenticated()) {
-      const username = (req.user as any)?.username || 'unknown';
-      console.log("Logging out user:", username);
-    }
-    
-    req.logout((err) => {
-      if (err) {
-        console.error("Logout error:", err);
-        return res.status(500).json({ message: "Failed to logout" });
-      }
-      
-      if (req.session) {
-        req.session.destroy((err) => {
-          if (err) {
-            console.error("Session destruction error:", err);
-            return res.status(500).json({ message: "Failed to destroy session" });
-          }
-          
+      req.logout((err) => {
+        if (err) {
+          return res.status(500).json({ message: "Failed to logout" });
+        }
+        
+        // Destroy the session
+        if (req.session) {
+          req.session.destroy((err) => {
+            if (err) {
+              return res.status(500).json({ message: "Failed to destroy session" });
+            }
+            
+            // Clear the cookie
+            res.clearCookie("connect.sid", {
+              path: "/",
+              httpOnly: true,
+              sameSite: 'lax'
+            });
+            
+            return res.json({ message: "Logged out successfully" });
+          });
+        } else {
           // Clear the cookie
-          res.clearCookie("connect.sid", { 
-            path: '/',
+          res.clearCookie("connect.sid", {
+            path: "/",
             httpOnly: true,
-            secure: false,
             sameSite: 'lax'
           });
           
-          console.log("Logout successful, session destroyed");
           return res.json({ message: "Logged out successfully" });
-        });
-      } else {
-        // Clear the cookie even if no session
-        res.clearCookie("connect.sid", { 
-          path: '/',
-          httpOnly: true,
-          secure: false,
-          sameSite: 'lax'
-        });
-        
-        console.log("Logout successful, no session to destroy");
-        return res.json({ message: "Logged out successfully" });
-      }
-    });
+        }
+      });
+    } else {
+      return res.json({ message: "Not logged in" });
+    }
   });
 
   app.get("/api/current-user", (req, res) => {
-    console.log("Current user check, authenticated:", req.isAuthenticated());
-    
     if (!req.isAuthenticated() || !req.user) {
-      console.log("Not authenticated");
       return res.status(401).json({ message: "Not authenticated" });
     }
 
@@ -401,8 +385,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       username: user.username,
       role: user.role
     };
-
-    console.log("Current user:", safeUser.username);
     
     // Set cache-control headers
     res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');

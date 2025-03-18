@@ -37,56 +37,49 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const [error, setError] = useState<string | null>(null);
 
   // Function to check authentication status
-  const checkAuth = useCallback(async (showErrors = false) => {
+  const checkAuth = useCallback(async () => {
     try {
-      console.log("Checking authentication status...");
+      // Check authentication status from the server
+      setLoading(true);
       
       const response = await fetch("/api/current-user", {
         method: "GET",
-        credentials: "include",
         headers: {
-          "Cache-Control": "no-cache, no-store, must-revalidate",
-          "Pragma": "no-cache",
-          "Expires": "0"
-        }
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
       });
-      
+
       if (response.ok) {
         const data = await response.json();
-        if (data && data.user) {
-          console.log("User authenticated:", data.user.username);
+        if (data.user) {
+          // Successfully authenticated user
           setUser(data.user);
-          return true;
+          setError(null);
         } else {
-          console.log("No user data in response");
+          // Response OK but no user data
           setUser(null);
-          return false;
         }
       } else {
-        console.log("Not authenticated", response.status);
+        // Not authenticated
         setUser(null);
-        return false;
       }
-    } catch (error) {
-      console.error("Auth check failed:", error);
-      if (showErrors) {
-        toast({
-          title: "Session Error",
-          description: "Failed to verify your session. Please try refreshing the page.",
-          variant: "destructive",
-        });
-      }
+    } catch (err) {
+      // Authentication check failed
+      setError("Failed to check authentication status");
       setUser(null);
-      return false;
+    } finally {
+      setLoading(false);
     }
-  }, [toast]);
+  }, []);
 
   // Function to refresh the session explicitly
   const refreshSession = useCallback(async () => {
     setLoading(true);
-    await checkAuth(true);
+    await checkAuth();
     setLoading(false);
   }, [checkAuth]);
 
@@ -114,71 +107,73 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => clearInterval(intervalId);
   }, [user, checkAuth]);
 
-  // Login function
+  // Login the user
   const login = async (username: string, password: string) => {
     try {
+      // Attempt user login
       setLoading(true);
-      console.log("Attempting login for:", username);
+      setError(null);
       
       const response = await fetch("/api/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Cache-Control": "no-cache, no-store, must-revalidate",
         },
+        credentials: "include",
         body: JSON.stringify({ username, password }),
-        credentials: "include"
       });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Login failed");
+
+      // Handle non-JSON responses (indicates a server error)
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        const errorText = await response.text();
+        console.error("Non-JSON response:", errorText);
+        throw new Error("The server returned an invalid response. Please try again later.");
       }
-      
+
       const data = await response.json();
-      
-      if (data && data.user) {
-        console.log("Login successful:", data.user.username);
+
+      if (response.ok) {
+        // Login successful
         setUser(data.user);
-        // After login, ensure we have the latest session cookie
-        document.cookie = document.cookie;
-        return; // Successfully logged in
+        setError(null);
+        return data;
       } else {
-        throw new Error("Invalid response from server");
+        // Login failed with error from server
+        setError(data.message || "Login failed");
+        throw new Error(data.message || "Login failed");
       }
-    } catch (error: any) {
-      const errorMessage = error.message || "Login failed. Please try again.";
-      console.error("Login error:", errorMessage);
-      
-      toast({
-        title: "Authentication Error",
-        description: errorMessage,
-        variant: "destructive",
-      });
-      throw error;
+    } catch (err: any) {
+      // Error during login process
+      if (err.message === "Failed to fetch") {
+        setError("Cannot connect to the server. Please check your internet connection.");
+      } else {
+        setError(err.message || "An error occurred during login");
+      }
+      throw err;
     } finally {
       setLoading(false);
     }
   };
 
-  // Logout function
+  // Logout the user
   const logout = async () => {
     try {
-      console.log("Logging out...");
+      // Attempt to logout
       setLoading(true);
       
-      await fetch("/api/logout", {
+      const response = await fetch("/api/logout", {
         method: "POST",
         credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        }
       });
-      
-      console.log("Logout successful");
-      setUser(null);
-    } catch (error) {
-      console.error("Logout failed:", error);
+
+      if (response.ok) {
+        // Logout successful
+        setUser(null);
+      }
+    } catch (err) {
+      // Error during logout
+      setError("Logout failed");
     } finally {
       setLoading(false);
     }

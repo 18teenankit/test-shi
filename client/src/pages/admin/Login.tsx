@@ -49,7 +49,14 @@ export default function Login() {
       localStorage.setItem('admin_last_login', Date.now().toString());
       navigate("/admin");
     } catch (error: any) {
-      setErrorMessage(error.message || "Login failed. Please try again.");
+      // Provide more specific error message based on the error type
+      if (error.message.includes("invalid response")) {
+        setErrorMessage("Server error: The server is currently unavailable. Please try again later.");
+      } else if (error.message.includes("internet connection")) {
+        setErrorMessage("Connection error: Unable to connect to the server. Please check your network.");
+      } else {
+        setErrorMessage(error.message || "Login failed. Please try again.");
+      }
     } finally {
       setIsLoading(false);
     }

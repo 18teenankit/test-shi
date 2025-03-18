@@ -128,7 +128,7 @@ export default function Terms() {
                 <div className="mt-3">
                   <p><strong>Shivanshi Enterprises</strong></p>
                   <p>Email: shivanshienterprises44@gmail.com</p>
-                  <p>Phone: +91 9418974444</p>
+                  <p>Phone: +91 1234567890</p>
                 </div>
               </section>
             </div>

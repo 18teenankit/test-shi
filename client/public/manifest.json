@@ -1,0 +1,21 @@
+{
+  "name": "Shivanshi Enterprises",
+  "short_name": "Shivanshi",
+  "description": "Your trusted partner for high-quality chemicals and compounds across India.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#b01e2f",
+  "icons": [
+    {
+      "src": "/uploads/logo-1742233935605-1ec8d0e89d22.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "/uploads/logo-1742233935605-1ec8d0e89d22.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+} 

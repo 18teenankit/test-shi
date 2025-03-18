@@ -141,24 +141,33 @@ export class MemStorage implements IStorage {
   }
 
   private async initializeDefaultData() {
-    // Create default admin users
-    const hashedPassword1 = await bcrypt.hash("Girisunil@4444", 10);
-    this.users.set(this.userCurrentId, {
-      id: this.userCurrentId++,
-      username: "Sunilgiri@admin",
-      password: hashedPassword1,
-      role: "super_admin",
-      createdAt: new Date()
-    });
+    // Create default admin users only if they don't exist already
+    // IMPORTANT: In production, use environment variables for initial credentials
+    // and ensure they are changed on first login
+    const adminUserExists = Array.from(this.users.values()).some(
+      (user) => user.username === "Sunilgiri@admin"
+    );
 
-    const hashedPassword2 = await bcrypt.hash("Ankit@968511", 10);
-    this.users.set(this.userCurrentId, {
-      id: this.userCurrentId++,
-      username: "Ankit@admin",
-      password: hashedPassword2,
-      role: "manager",
-      createdAt: new Date()
-    });
+    if (!adminUserExists) {
+      // Admin credentials should be changed immediately after deployment
+      const hashedPassword1 = await bcrypt.hash("Girisunil@4444", 10);
+      this.users.set(this.userCurrentId, {
+        id: this.userCurrentId++,
+        username: "Sunilgiri@admin",
+        password: hashedPassword1,
+        role: "super_admin",
+        createdAt: new Date()
+      });
+  
+      const hashedPassword2 = await bcrypt.hash("Ankit@968511", 10);
+      this.users.set(this.userCurrentId, {
+        id: this.userCurrentId++,
+        username: "Ankit@admin",
+        password: hashedPassword2,
+        role: "manager",
+        createdAt: new Date()
+      });
+    }
 
     // Empty categories - to be added from admin panel
     const categories = [];
