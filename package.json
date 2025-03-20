@@ -5,11 +5,19 @@
   "license": "MIT",
   "scripts": {
     "dev": "tsx server/index.ts",
-    "build": "vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
-    "start": "NODE_ENV=production node dist/index.js",
+    "build": "rimraf dist && vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist/server && cp -r uploads dist/client/ && cp -r client/public/* dist/client/",
+    "start": "NODE_ENV=production node dist/server/index.js",
     "check": "tsc",
-    "db:push": "drizzle-kit push"
+    "db:generate": "drizzle-kit generate:pg",
+    "db:up": "drizzle-kit up:pg",
+    "db:migrate": "tsx scripts/migrate-data.ts",
+    "db:setup": "tsx scripts/setup-db.ts",
+    "clean": "rimraf dist",
+    "build:all": "tsx build.js",
+    "prebuild": "npm run clean",
+    "postbuild": "echo 'Build completed successfully!'"
   },
+
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
     "@jridgewell/trace-mapping": "^0.3.25",
@@ -64,6 +72,7 @@
     "nanoid": "^5.1.4",
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
+    "pg": "^8.11.3",
     "react": "^18.3.1",
     "react-day-picker": "^8.10.1",
     "react-dom": "^18.3.1",
@@ -90,18 +99,21 @@
     "@types/node": "20.16.11",
     "@types/passport": "^1.0.16",
     "@types/passport-local": "^1.0.38",
+    "@types/pg": "^8.10.9",
     "@types/react": "^18.3.11",
     "@types/react-dom": "^18.3.1",
     "@types/ws": "^8.5.13",
     "@vitejs/plugin-react": "^4.3.2",
     "autoprefixer": "^10.4.20",
-    "drizzle-kit": "^0.30.4",
+    "concurrently": "^9.1.2",
+    "drizzle-kit": "^0.19.1",
     "esbuild": "^0.25.0",
     "postcss": "^8.4.47",
+    "rimraf": "^5.0.5",
     "tailwindcss": "^3.4.14",
     "tsx": "^4.19.1",
     "typescript": "5.6.3",
-    "vite": "^5.4.14"
+    "vite": "^6.2.2"
   },
   "optionalDependencies": {
     "bufferutil": "^4.0.8"

@@ -58,12 +58,20 @@ app.use((req, res, next) => {
 (async () => {
   const server = await registerRoutes(app);
 
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
-
-    res.status(status).json({ message });
-    console.error("Server error:", err);
+  app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+    console.error('Error:', err);
+    
+    // Handle source map errors
+    if (req.url.endsWith('.map')) {
+      return res.status(404).end();
+    }
+    
+    // Handle other errors
+    res.status(500).json({
+      message: process.env.NODE_ENV === 'production' 
+        ? 'Internal Server Error' 
+        : err.message
+    });
   });
 
   // importantly only setup vite in development and after
@@ -78,12 +86,24 @@ app.use((req, res, next) => {
   // ALWAYS serve the app on port 5000
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
-  const port = 5000;
-  server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true,
-  }, () => {
-    log(`serving on port ${port}`);
+  const port = process.env.PORT || 5000;
+  server.listen(port, () => {
+    log(`Server running on port ${port}`);
+  });
+
+  // Handle uncaught exceptions
+  process.on('uncaughtException', (err) => {
+    console.error('Uncaught Exception:', err);
+    server.close(() => {
+      process.exit(1);
+    });
+  });
+
+  // Handle unhandled promise rejections
+  process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+    server.close(() => {
+      process.exit(1);
+    });
   });
 })();

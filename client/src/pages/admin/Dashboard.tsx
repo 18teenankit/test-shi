@@ -176,20 +176,7 @@ export default function Dashboard() {
               </div>
             ) : (
               <>
-                {stats.outOfStockProducts > 0 && (
-                  <Alert variant="destructive">
-                    <AlertTriangle className="h-4 w-4" />
-                    <AlertTitle>Out of Stock Items</AlertTitle>
-                    <AlertDescription>
-                      There are {stats.outOfStockProducts} products currently out of stock.
-                      <Link href="/admin/products">
-                        <Button variant="link" className="p-0 h-auto ml-2">
-                          View products
-                        </Button>
-                      </Link>
-                    </AlertDescription>
-                  </Alert>
-                )}
+
                 
                 {stats.newContactRequests > 0 && (
                   <Alert>

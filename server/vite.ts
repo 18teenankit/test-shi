@@ -26,7 +26,11 @@ export async function setupVite(app: Express, server: Server) {
   const serverOptions = {
     middlewareMode: true,
     hmr: { server },
-    allowedHosts: true,
+    allowedHosts: true as true,
+    fs: {
+      strict: false,
+      allow: ['..']
+    }
   };
 
   const vite = await createViteServer({
@@ -41,6 +45,15 @@ export async function setupVite(app: Express, server: Server) {
     },
     server: serverOptions,
     appType: "custom",
+  });
+
+  // Handle source map requests
+  app.use((req, res, next) => {
+    if (req.url.endsWith('.map')) {
+      res.status(404).end();
+      return;
+    }
+    next();
   });
 
   app.use(vite.middlewares);
@@ -71,7 +84,7 @@ export async function setupVite(app: Express, server: Server) {
 }
 
 export function serveStatic(app: Express) {
-  const distPath = path.resolve(__dirname, "public");
+  const distPath = path.resolve(__dirname, "..", "client");
 
   if (!fs.existsSync(distPath)) {
     throw new Error(
@@ -79,7 +92,36 @@ export function serveStatic(app: Express) {
     );
   }
 
-  app.use(express.static(distPath));
+  // Serve static files with proper caching headers
+  app.use(express.static(distPath, {
+    maxAge: '1y',
+    etag: true,
+    lastModified: true,
+    setHeaders: (res, path) => {
+      // Don't cache HTML files
+      if (path.endsWith('.html')) {
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+      }
+      // Cache offline.html for 1 year
+      if (path.endsWith('offline.html')) {
+        res.setHeader('Cache-Control', 'public, max-age=31536000');
+      }
+      // Block source map requests
+      if (path.endsWith('.map')) {
+        res.status(404).end();
+      }
+    }
+  }));
+
+  // Serve offline.html for offline requests
+  app.use((req, res, next) => {
+    if (req.headers['x-offline']) {
+      return res.sendFile(path.resolve(distPath, 'offline.html'));
+    }
+    next();
+  });
 
   // fall through to index.html if the file doesn't exist
   app.use("*", (_req, res) => {

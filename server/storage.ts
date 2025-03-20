@@ -4,9 +4,11 @@ import {
   type Product, type InsertProduct, type ProductImage, type InsertProductImage,
   type HeroImage, type InsertHeroImage, type ContactRequest, type InsertContactRequest,
   type Setting, type InsertSetting
-} from "@shared/schema";
+} from "../shared/schema";
 import bcrypt from "bcrypt";
 import fs from 'fs';
+import { db } from "./db";
+import { eq, and, desc, asc } from "drizzle-orm";
 
 const DATA_FILE = './data.json';
 
@@ -547,4 +549,224 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+// PostgreSQL Storage Implementation
+export class PostgresStorage implements IStorage {
+  // User methods
+  async getUser(id: number): Promise<User | undefined> {
+    const result = await db.select().from(users).where(eq(users.id, id));
+    return result[0];
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const result = await db.select().from(users).where(eq(users.username, username));
+    return result[0];
+  }
+
+  async createUser(user: InsertUser): Promise<User> {
+    const result = await db.insert(users).values(user).returning();
+    return result[0];
+  }
+
+  async validateUser(username: string, password: string): Promise<User | null> {
+    const user = await this.getUserByUsername(username);
+    if (!user) return null;
+    
+    const isValid = await bcrypt.compare(password, user.password);
+    return isValid ? user : null;
+  }
+
+  // Category methods
+  async getCategories(): Promise<Category[]> {
+    return await db.select().from(categories).orderBy(asc(categories.name));
+  }
+
+  async getCategory(id: number): Promise<Category | undefined> {
+    const result = await db.select().from(categories).where(eq(categories.id, id));
+    return result[0];
+  }
+
+  async createCategory(category: InsertCategory): Promise<Category> {
+    const result = await db.insert(categories).values(category).returning();
+    return result[0];
+  }
+
+  async updateCategory(id: number, categoryUpdate: Partial<InsertCategory>): Promise<Category | undefined> {
+    const result = await db
+      .update(categories)
+      .set(categoryUpdate)
+      .where(eq(categories.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteCategory(id: number): Promise<boolean> {
+    const result = await db.delete(categories).where(eq(categories.id, id));
+    return result.count > 0;
+  }
+
+  // Product methods
+  async getProducts(): Promise<Product[]> {
+    return await db.select().from(products).orderBy(asc(products.name));
+  }
+
+  async getProductsByCategory(categoryId: number): Promise<Product[]> {
+    return await db
+      .select()
+      .from(products)
+      .where(eq(products.categoryId, categoryId))
+      .orderBy(asc(products.name));
+  }
+
+  async getProduct(id: number): Promise<Product | undefined> {
+    const result = await db.select().from(products).where(eq(products.id, id));
+    return result[0];
+  }
+
+  async createProduct(product: InsertProduct): Promise<Product> {
+    const result = await db.insert(products).values(product).returning();
+    return result[0];
+  }
+
+  async updateProduct(id: number, productUpdate: Partial<InsertProduct>): Promise<Product | undefined> {
+    const result = await db
+      .update(products)
+      .set(productUpdate)
+      .where(eq(products.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteProduct(id: number): Promise<boolean> {
+    const result = await db.delete(products).where(eq(products.id, id));
+    return result.count > 0;
+  }
+
+  // Product Image methods
+  async getProductImages(productId: number): Promise<ProductImage[]> {
+    return await db
+      .select()
+      .from(productImages)
+      .where(eq(productImages.productId, productId))
+      .orderBy(asc(productImages.order));
+  }
+
+  async createProductImage(image: InsertProductImage): Promise<ProductImage> {
+    const result = await db.insert(productImages).values(image).returning();
+    return result[0];
+  }
+
+  async updateProductImage(id: number, imageUpdate: Partial<InsertProductImage>): Promise<ProductImage | undefined> {
+    const result = await db
+      .update(productImages)
+      .set(imageUpdate)
+      .where(eq(productImages.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteProductImage(id: number): Promise<boolean> {
+    const result = await db.delete(productImages).where(eq(productImages.id, id));
+    return result.count > 0;
+  }
+
+  // Hero Image methods
+  async getHeroImages(): Promise<HeroImage[]> {
+    return await db
+      .select()
+      .from(heroImages)
+      .where(eq(heroImages.isActive, true))
+      .orderBy(asc(heroImages.order));
+  }
+
+  async createHeroImage(image: InsertHeroImage): Promise<HeroImage> {
+    const result = await db.insert(heroImages).values(image).returning();
+    return result[0];
+  }
+
+  async updateHeroImage(id: number, imageUpdate: Partial<InsertHeroImage>): Promise<HeroImage | undefined> {
+    const result = await db
+      .update(heroImages)
+      .set(imageUpdate)
+      .where(eq(heroImages.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteHeroImage(id: number): Promise<boolean> {
+    const result = await db.delete(heroImages).where(eq(heroImages.id, id));
+    return result.count > 0;
+  }
+
+  // Contact Request methods
+  async getContactRequests(): Promise<ContactRequest[]> {
+    return await db
+      .select()
+      .from(contactRequests)
+      .orderBy(desc(contactRequests.createdAt));
+  }
+
+  async getContactRequest(id: number): Promise<ContactRequest | undefined> {
+    const result = await db.select().from(contactRequests).where(eq(contactRequests.id, id));
+    return result[0];
+  }
+
+  async createContactRequest(request: InsertContactRequest): Promise<ContactRequest> {
+    const result = await db.insert(contactRequests)
+      .values({
+        ...request,
+        status: "new"
+      })
+      .returning();
+    return result[0];
+  }
+
+  async updateContactRequestStatus(id: number, status: string): Promise<ContactRequest | undefined> {
+    const result = await db
+      .update(contactRequests)
+      .set({ status })
+      .where(eq(contactRequests.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteContactRequest(id: number): Promise<boolean> {
+    const result = await db.delete(contactRequests).where(eq(contactRequests.id, id));
+    return result.count > 0;
+  }
+
+  // Settings methods
+  async getSetting(key: string): Promise<Setting | undefined> {
+    const result = await db.select().from(settings).where(eq(settings.key, key));
+    return result[0];
+  }
+
+  async getAllSettings(): Promise<Setting[]> {
+    return await db.select().from(settings);
+  }
+
+  async upsertSetting(setting: InsertSetting): Promise<Setting> {
+    // Check if setting exists
+    const existing = await this.getSetting(setting.key);
+    
+    if (existing) {
+      // Update
+      const result = await db
+        .update(settings)
+        .set({ value: setting.value })
+        .where(eq(settings.key, setting.key))
+        .returning();
+      return result[0];
+    } else {
+      // Insert
+      const result = await db.insert(settings).values(setting).returning();
+      return result[0];
+    }
+  }
+}
+
+// Export the appropriate storage implementation
+// Use PostgreSQL if DATABASE_URL is set, otherwise fall back to in-memory storage
+export const storage: IStorage = 
+  process.env.DATABASE_URL || (process.env.NODE_ENV === 'production')
+    ? new PostgresStorage()
+    : new MemStorage();

@@ -195,6 +195,132 @@
       "description": "",
       "categoryId": 4,
       "createdAt": "2025-03-17T16:56:43.639Z"
+    },
+    "34": {
+      "id": 34,
+      "name": "Potassium Bromide",
+      "description": "",
+      "categoryId": 4,
+      "createdAt": "2025-03-20T15:11:01.245Z"
+    },
+    "35": {
+      "id": 35,
+      "name": " Ammonia Bromide",
+      "description": "",
+      "categoryId": 4,
+      "createdAt": "2025-03-20T15:11:33.221Z"
+    },
+    "36": {
+      "id": 36,
+      "name": " Cuprous Bromide",
+      "description": "",
+      "categoryId": 4,
+      "createdAt": "2025-03-20T15:12:07.546Z"
+    },
+    "37": {
+      "id": 37,
+      "name": "Ethyl Bromide",
+      "description": "",
+      "categoryId": 4,
+      "createdAt": "2025-03-20T15:12:21.050Z"
+    },
+    "38": {
+      "id": 38,
+      "name": "Aliphatic Bromide",
+      "description": "",
+      "categoryId": 4,
+      "createdAt": "2025-03-20T15:12:36.095Z"
+    },
+    "39": {
+      "id": 39,
+      "name": "Isopropyl Bromide",
+      "description": "",
+      "categoryId": 4,
+      "createdAt": "2025-03-20T15:12:46.999Z"
+    },
+    "40": {
+      "id": 40,
+      "name": "Tetra Butyl Ammonium Bromide",
+      "description": "",
+      "categoryId": 4,
+      "createdAt": "2025-03-20T15:13:15.779Z"
+    },
+    "41": {
+      "id": 41,
+      "name": "Bromide Salt",
+      "description": "",
+      "categoryId": 4,
+      "createdAt": "2025-03-20T15:14:04.663Z"
+    },
+    "42": {
+      "id": 42,
+      "name": "Pentyl Bromide",
+      "description": "",
+      "categoryId": 4,
+      "createdAt": "2025-03-20T15:14:20.483Z"
+    },
+    "43": {
+      "id": 43,
+      "name": "Zinc Bromide",
+      "description": "",
+      "categoryId": 4,
+      "createdAt": "2025-03-20T15:14:48.270Z"
+    },
+    "44": {
+      "id": 44,
+      "name": " Benzyl Bromide",
+      "description": "",
+      "categoryId": 4,
+      "createdAt": "2025-03-20T15:15:04.426Z"
+    },
+    "45": {
+      "id": 45,
+      "name": "N-Propyl Bromide",
+      "description": "",
+      "categoryId": 4,
+      "createdAt": "2025-03-20T15:15:16.853Z"
+    },
+    "46": {
+      "id": 46,
+      "name": " Magnesium Sulphate",
+      "description": "",
+      "categoryId": 5,
+      "createdAt": "2025-03-20T15:15:43.986Z"
+    },
+    "47": {
+      "id": 47,
+      "name": "Sodium Sulphate",
+      "description": "",
+      "categoryId": 5,
+      "createdAt": "2025-03-20T15:15:54.578Z"
+    },
+    "49": {
+      "id": 49,
+      "name": "Sodium Bi Sulphite (Solution)",
+      "description": "",
+      "categoryId": 5,
+      "createdAt": "2025-03-20T15:16:23.399Z"
+    },
+    "50": {
+      "id": 50,
+      "name": "Sodium Hydro Sulphide",
+      "description": "",
+      "categoryId": 5,
+      "createdAt": "2025-03-20T15:16:34.637Z"
+    },
+    "51": {
+      "id": 51,
+      "name": "Ammonium Sulfate",
+      "description": "",
+      "categoryId": 5,
+      "createdAt": "2025-03-20T15:16:47.787Z"
+    },
+    "52": {
+      "id": 52,
+      "name": "Poly Aluminium Chloride (PAC)",
+      "description": "",
+      "categoryId": 6,
+      "createdAt": "2025-03-20T16:44:01.198Z"
     }
   },
   "categories": {

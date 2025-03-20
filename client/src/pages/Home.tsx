@@ -21,7 +21,7 @@ export default function Home() {
     <Layout>
       {/* SEO Meta Tags */}
       <Head 
-        title="Shivanshi Enterprises - High-Quality Chemicals & Compounds Supplier"
+        title="Shivanshi Enterprises"
         description="Shivanshi Enterprises is a trusted supplier of premium chemicals and compounds across India. We provide reliable solutions for all your chemical needs with quality and safety."
         keywords="chemicals, compounds, chemical dealers, chemical suppliers, industrial chemicals, laboratory chemicals, Shivanshi Enterprises, Prayagraj chemicals"
         canonicalUrl="/"
