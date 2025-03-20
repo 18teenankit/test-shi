@@ -21,8 +21,47 @@ interface Product {
 }
 
 export function FeaturedProducts({ language = "en" }: FeaturedProductsProps) {
+  console.log('FeaturedProducts fetching products:', { queryKey: "/api/products" });
+  
   const { data: products = [], isLoading, error } = useQuery<Product[]>({
     queryKey: ["/api/products"],
+    queryFn: async () => {
+      console.log('Starting product fetch');
+      try {
+        const response = await fetch('/api/products', {
+          credentials: 'include',
+          headers: {
+            'Accept': 'application/json',
+            'Cache-Control': 'no-cache'
+          }
+        });
+        
+        console.log('Product fetch response:', response.status, response.statusText);
+        
+        if (!response.ok) {
+          console.error('Product fetch failed:', response.status, response.statusText);
+          throw new Error(`Error fetching products: ${response.status}`);
+        }
+        
+        const contentType = response.headers.get('content-type');
+        console.log('Product fetch content-type:', contentType);
+        
+        if (!contentType || !contentType.includes('application/json')) {
+          console.error('Invalid content type:', contentType);
+          const text = await response.text();
+          console.error('Response text (first 100 chars):', text.substring(0, 100));
+          throw new Error('Server returned non-JSON response');
+        }
+        
+        const data = await response.json();
+        console.log('Product fetch successful, found', data.length, 'products');
+        return data;
+      } catch (err) {
+        console.error('Failed to load products:', err);
+        throw err;
+      }
+    },
+    retry: 1
   });
   
   const content = {

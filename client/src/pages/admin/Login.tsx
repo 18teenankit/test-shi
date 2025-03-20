@@ -44,14 +44,30 @@ export default function Login() {
     setIsLoading(true);
     
     try {
+      console.log("Attempting login...");
+      
+      // First check if API server is reachable
+      try {
+        const healthCheck = await fetch('/api/health', {
+          method: 'GET',
+          headers: { 'Accept': 'application/json' },
+        });
+        console.log("Health check response:", healthCheck.status, healthCheck.statusText);
+      } catch (healthError) {
+        console.error("Health check failed:", healthError);
+      }
+      
       await login(data.username, data.password);
+      
       // Store login timestamp in localStorage to track session age
       localStorage.setItem('admin_last_login', Date.now().toString());
       navigate("/admin");
     } catch (error: any) {
+      console.error("Login error:", error);
+      
       // Provide more specific error message based on the error type
-      if (error.message.includes("invalid response")) {
-        setErrorMessage("Server error: The server is currently unavailable. Please try again later.");
+      if (error.message.includes("invalid response") || error.message.includes("HTML instead of JSON")) {
+        setErrorMessage("Server error: The server responded with HTML instead of JSON. Please try again later.");
       } else if (error.message.includes("internet connection")) {
         setErrorMessage("Connection error: Unable to connect to the server. Please check your network.");
       } else {
@@ -177,8 +193,6 @@ export default function Login() {
             </form>
           </Form>
         </CardContent>
-        
-        {/* Card footer removed */}
       </Card>
     </div>
   );

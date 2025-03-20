@@ -43,6 +43,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Serve static files from uploads directory
   app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
   
+  // Simple health check endpoint
+  app.get("/api/health", (req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.json({ status: "ok", timestamp: new Date().toISOString() });
+  });
+  
   // Configure session middleware
   app.use(
     session({
@@ -163,32 +169,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/products", async (req, res) => {
     try {
+      // Set JSON content type header
+      res.setHeader('Content-Type', 'application/json');
+      // Prevent caching
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+      
       const categoryId = req.query.categoryId ? Number(req.query.categoryId) : undefined;
 
       let products;
-      if (categoryId) {
-        products = await storage.getProductsByCategory(categoryId);
-      } else {
-        products = await storage.getProducts();
+      try {
+        if (categoryId) {
+          products = await storage.getProductsByCategory(categoryId);
+        } else {
+          products = await storage.getProducts();
+        }
+      } catch (error) {
+        console.error("Error fetching products:", error);
+        return res.status(500).json({ message: "Failed to fetch products from storage" });
       }
 
       // Enhance products with category info only - no images
-      const enhancedProducts = await Promise.all(
-        products.map(async (product) => {
-          const category = product.categoryId 
-            ? await storage.getCategory(product.categoryId) 
-            : undefined;
+      try {
+        const enhancedProducts = await Promise.all(
+          products.map(async (product) => {
+            const category = product.categoryId 
+              ? await storage.getCategory(product.categoryId) 
+              : undefined;
 
-          return {
-            ...product,
-            category: category ? { id: category.id, name: category.name } : null,
-            mainImage: null // Always set to null to maintain API structure but remove image functionality
-          };
-        })
-      );
+            return {
+              ...product,
+              category: category ? { id: category.id, name: category.name } : null,
+              mainImage: null // Always set to null to maintain API structure but remove image functionality
+            };
+          })
+        );
 
-      res.json(enhancedProducts);
+        res.json(enhancedProducts);
+      } catch (error) {
+        console.error("Error enhancing products:", error);
+        return res.status(500).json({ message: "Failed to process products" });
+      }
     } catch (error) {
+      console.error("Global products error:", error);
       res.status(500).json({ message: "Failed to fetch products" });
     }
   });
@@ -217,9 +241,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/hero-images", async (req, res) => {
     try {
-      const heroImages = await storage.getHeroImages();
-      res.json(heroImages);
+      // Set JSON content type header
+      res.setHeader('Content-Type', 'application/json');
+      // Prevent caching
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+      
+      console.log("Hero images request received");
+      
+      try {
+        const heroImages = await storage.getHeroImages();
+        console.log(`Retrieved ${heroImages.length} hero images`);
+        return res.json(heroImages);
+      } catch (error) {
+        console.error("Error fetching hero images from storage:", error);
+        return res.status(500).json({ message: "Failed to fetch hero images from storage" });
+      }
     } catch (error) {
+      console.error("Global hero images error:", error);
       res.status(500).json({ message: "Failed to fetch hero images" });
     }
   });
@@ -241,9 +281,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/settings", async (req, res) => {
     try {
       const settings = await storage.getAllSettings();
-      // Convert array to key-value object
+      // Convert array to key-value object with proper type handling
       const settingsObj = settings.reduce((acc, setting) => {
-        acc[setting.key] = setting.value;
+        if (setting.key && setting.value !== null) {
+          acc[setting.key] = setting.value;
+        }
         return acc;
       }, {} as Record<string, string | undefined>);
 
@@ -260,14 +302,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Auth endpoints
   app.post("/api/login", (req, res, next) => {
+    // Always ensure proper content type for auth endpoints
+    res.setHeader('Content-Type', 'application/json');
+    
     try {
+      // Parse login data
       const loginData = loginSchema.parse(req.body);
-      // Just log attempt without username for security
       console.log("Login attempt received");
 
       // Check if user is already authenticated
       if (req.isAuthenticated()) {
-        // If already authenticated, return the current user
         if (req.user) {
           const user = req.user as any;
           const safeUser = {
@@ -288,18 +332,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      passport.authenticate("local", (err, user, info) => {
-        if (err) {
-          return next(err);
+      // Use passport for authentication
+      passport.authenticate("local", (authError: Error | null, user: any, info: { message: string }) => {
+        if (authError) {
+          console.error("Authentication error:", authError);
+          return res.status(500).json({ message: "Authentication error occurred" });
         }
         
         if (!user) {
-          return res.status(401).json({ message: info.message });
+          return res.status(401).json({ message: info?.message || "Invalid credentials" });
         }
 
-        req.logIn(user, (err) => {
-          if (err) {
-            return next(err);
+        req.logIn(user, (loginError) => {
+          if (loginError) {
+            console.error("Login error:", loginError);
+            return res.status(500).json({ message: "Login error occurred" });
           }
 
           // Set session cookie to expire in 30 days
@@ -318,11 +365,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
             username: user.username,
             role: user.role
           };
-          
-          // Set cache-control headers
-          res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-          res.setHeader('Pragma', 'no-cache');
-          res.setHeader('Expires', '0');
           
           return res.json({ user: safeUser });
         });
@@ -374,6 +416,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.get("/api/current-user", (req, res) => {
+    // Set JSON content type header
+    res.setHeader('Content-Type', 'application/json');
+    // Prevent caching
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    
     if (!req.isAuthenticated() || !req.user) {
       return res.status(401).json({ message: "Not authenticated" });
     }
@@ -385,11 +434,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       username: user.username,
       role: user.role
     };
-    
-    // Set cache-control headers
-    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-    res.setHeader('Pragma', 'no-cache');
-    res.setHeader('Expires', '0');
     
     res.json({ user: safeUser });
   });
@@ -452,10 +496,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Products management
   app.post("/api/admin/products", isAuthenticated, async (req, res) => {
     try {
-      const productData = insertProductSchema.parse(req.body);
-      const result = await storage.createProduct(productData);
+      // Convert numeric string values to numbers
+      const productData = {
+        ...req.body,
+        categoryId: req.body.categoryId ? Number(req.body.categoryId) : undefined
+      };
+      
+      const parsedData = insertProductSchema.parse(productData);
+      const result = await storage.createProduct(parsedData);
       res.status(201).json(result);
     } catch (error) {
+      console.error("Product creation error:", error);
       handleZodError(error, res);
     }
   });
@@ -463,7 +514,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/admin/products/:id", isAuthenticated, async (req, res) => {
     try {
       const id = Number(req.params.id);
-      const result = await storage.updateProduct(id, req.body);
+      
+      // Convert numeric string values to numbers
+      const productData = {
+        ...req.body,
+        categoryId: req.body.categoryId ? Number(req.body.categoryId) : undefined
+      };
+      
+      const result = await storage.updateProduct(id, productData);
 
       if (!result) {
         return res.status(404).json({ message: "Product not found" });
@@ -471,6 +529,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json(result);
     } catch (error) {
+      console.error("Product update error:", error);
       handleZodError(error, res);
     }
   });
@@ -721,7 +780,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/admin/users", isSuperAdmin, async (req, res) => {
     try {
       // Get all users (this is for super_admin only)
-      const allUsers = Array.from((await storage as any).users.values()).map(user => ({
+      const allUsers = Array.from((await storage as any).users.values()).map((user: any) => ({
         id: user.id,
         username: user.username,
         role: user.role,

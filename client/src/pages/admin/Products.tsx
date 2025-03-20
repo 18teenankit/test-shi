@@ -50,17 +50,15 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 
-// Update the product schema to remove inStock
+// Update the product schema to ensure proper type conversion
 const productSchema = z.object({
   name: z.string().min(1, "Name is required"),
   description: z.string().optional(),
-  categoryId: z.number().optional(),
+  categoryId: z.string().transform((val) => Number(val)),
 });
 
 // Extended schema that will be used for form validation
-const extendedProductSchema = productSchema.extend({
-  // Remove inStock from the schema
-});
+const extendedProductSchema = productSchema;
 
 type ProductFormValues = z.infer<typeof extendedProductSchema>;
 
@@ -212,10 +210,9 @@ export default function Products() {
       return;
     }
     
-    // No need to parse categoryId, the schema validation will handle it
+    // No need to convert categoryId as the schema transformation handles it
     const formData = {
       ...data,
-      // Using data as is since the schema now uses z.coerce.number()
     };
 
     if (selectedProduct) {

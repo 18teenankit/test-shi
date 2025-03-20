@@ -49,6 +49,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
+          "Accept": "application/json"
         },
         credentials: "include",
       });
@@ -118,6 +119,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Accept": "application/json",
+          "Cache-Control": "no-cache"
         },
         credentials: "include",
         body: JSON.stringify({ username, password }),
@@ -128,6 +131,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!contentType || !contentType.includes("application/json")) {
         const errorText = await response.text();
         console.error("Non-JSON response:", errorText);
+        console.error("Response status:", response.status);
+        console.error("Response URL:", response.url);
         throw new Error("The server returned an invalid response. Please try again later.");
       }
 

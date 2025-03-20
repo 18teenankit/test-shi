@@ -6,6 +6,25 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// Add early middleware to ensure API routes return JSON
+app.use((req, res, next) => {
+  if (req.path.startsWith("/api")) {
+    // Set proper headers for all API responses
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    
+    // Handle redirects for auth routes
+    if (req.path === '/api/auth/login') {
+      req.url = '/api/login';
+    } else if (req.path === '/api/auth/user') {
+      req.url = '/api/current-user';
+    }
+  }
+  next();
+});
+
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;

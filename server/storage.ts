@@ -394,9 +394,57 @@ export class MemStorage implements IStorage {
 
   // Hero Image methods
   async getHeroImages(): Promise<HeroImage[]> {
-    return Array.from(this.heroImages.values())
-      .filter(image => image.isActive)
-      .sort((a, b) => a.order - b.order);
+    try {
+      console.log("Getting hero images, total count:", this.heroImages.size);
+      
+      // If no hero images exist, initialize with default ones
+      if (this.heroImages.size === 0) {
+        console.log("No hero images found, initializing default ones");
+        const defaultHeroImages = [
+          { 
+            imageUrl: "https://images.unsplash.com/photo-1603126857599-f6e157fa2fe6",
+            title: "Quality Chemicals & Compounds",
+            subtitle: "Your trusted partner for industrial chemicals across PAN India.",
+            buttonText: "Explore Products",
+            buttonLink: "/products",
+            order: 0,
+            isActive: true
+          },
+          { 
+            imageUrl: "https://images.unsplash.com/photo-1532187863486-abf9dbad1b69",
+            title: "Industrial Chemical Solutions",
+            subtitle: "Premium quality chemicals for manufacturing and industrial applications.",
+            buttonText: "View Products",
+            buttonLink: "/products",
+            order: 1,
+            isActive: true
+          }
+        ];
+        
+        defaultHeroImages.forEach(image => {
+          const newImage: HeroImage = {
+            id: this.heroImageCurrentId++,
+            ...image
+          };
+          this.heroImages.set(newImage.id, newImage);
+        });
+        
+        // Save the data to persist these defaults
+        this.saveData();
+      }
+      
+      const heroImagesArray = Array.from(this.heroImages.values())
+        .filter(image => image.isActive)
+        .sort((a, b) => a.order - b.order);
+      
+      console.log(`Returning ${heroImagesArray.length} active hero images`);
+      
+      return heroImagesArray;
+    } catch (error) {
+      console.error("Error in getHeroImages:", error);
+      // Return empty array in case of error to avoid breaking the UI
+      return [];
+    }
   }
 
   async createHeroImage(image: InsertHeroImage): Promise<HeroImage> {

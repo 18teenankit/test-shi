@@ -19,11 +19,51 @@ interface HeroSectionProps {
 }
 
 export function HeroSection({ language = "en" }: HeroSectionProps) {
-  const { data: heroImages, isLoading } = useQuery<HeroImage[]>({
+  console.log('HeroSection fetching hero images:', { queryKey: "/api/hero-images" });
+  
+  const { data: heroImages, isLoading, error } = useQuery<HeroImage[]>({
     queryKey: ["/api/hero-images"],
+    queryFn: async () => {
+      console.log('Starting hero images fetch');
+      try {
+        const response = await fetch('/api/hero-images', {
+          credentials: 'include',
+          headers: {
+            'Accept': 'application/json',
+            'Cache-Control': 'no-cache'
+          }
+        });
+        
+        console.log('Hero images fetch response:', response.status, response.statusText);
+        
+        if (!response.ok) {
+          console.error('Hero images fetch failed:', response.status, response.statusText);
+          throw new Error(`Error fetching hero images: ${response.status}`);
+        }
+        
+        const contentType = response.headers.get('content-type');
+        console.log('Hero images fetch content-type:', contentType);
+        
+        if (!contentType || !contentType.includes('application/json')) {
+          console.error('Invalid content type:', contentType);
+          const text = await response.text();
+          console.error('Response text (first 100 chars):', text.substring(0, 100));
+          throw new Error('Server returned non-JSON response');
+        }
+        
+        const data = await response.json();
+        console.log('Hero images fetch successful, found', data.length, 'hero images');
+        return data;
+      } catch (err) {
+        console.error('Failed to load hero images:', err);
+        throw err;
+      }
+    },
+    retry: 1
   });
   
   if (isLoading) {
+    console.log('HeroSection is loading...');
     return (
       <div className="relative bg-gray-50 dark:bg-gray-800 overflow-hidden" style={{ height: "500px" }}>
         <Skeleton className="w-full h-full" />
@@ -31,7 +71,12 @@ export function HeroSection({ language = "en" }: HeroSectionProps) {
     );
   }
   
+  if (error) {
+    console.error('HeroSection error:', error);
+  }
+  
   if (!heroImages || heroImages.length === 0) {
+    console.log('No hero images found, showing fallback');
     // Fallback hero if no images are available
     return (
       <div className="relative bg-gray-50 dark:bg-gray-800 overflow-hidden" style={{ height: "500px" }}>
@@ -65,6 +110,7 @@ export function HeroSection({ language = "en" }: HeroSectionProps) {
     );
   }
   
+  console.log('Rendering hero carousel with', heroImages.length, 'images');
   return (
     <HeroCarousel
       slides={heroImages.map((image: HeroImage) => ({
