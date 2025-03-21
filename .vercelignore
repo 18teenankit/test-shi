@@ -1,0 +1,9 @@
+.git
+node_modules
+.env
+.env.example
+dist
+drizzle
+uploads
+README.md
+Notes-for-project.md 
