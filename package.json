@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "tsx server/index.ts",
     "build": "rimraf dist && vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist/server && cp -r uploads dist/client/ && cp -r client/public/* dist/client/",
-    "vercel-build": "tsx build-vercel.js",
+    "vercel-build": "TS_NODE_PROJECT=tsconfig.vercel.json tsx build-vercel.js",
     "start": "NODE_ENV=production node dist/server/index.js",
     "check": "tsc",
     "db:generate": "drizzle-kit generate:pg",

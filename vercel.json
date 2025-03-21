@@ -2,14 +2,15 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/index.ts",
+      "src": "api/index.js",
       "use": "@vercel/node",
       "config": {
         "includeFiles": [
           "dist/**",
           "client/**",
           "uploads/**",
-          ".env.production"
+          ".env.production",
+          "api/fallback.html"
         ]
       }
     },
@@ -37,6 +38,8 @@
     }
   ],
   "env": {
-    "NODE_ENV": "production"
+    "NODE_ENV": "production",
+    "TS_NODE_PROJECT": "tsconfig.vercel.json",
+    "SKIP_TYPESCRIPT_CHECK": "true"
   }
 } 

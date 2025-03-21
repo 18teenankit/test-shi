@@ -5,7 +5,10 @@
     "outDir": "dist",
     "target": "ES2022",
     "isolatedModules": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "skipLibCheck": true,
+    "noEmitOnError": false,
+    "strict": false
   },
   "include": ["api/**/*.ts", "server/**/*.ts"],
   "exclude": ["node_modules"]

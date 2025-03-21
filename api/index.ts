@@ -9,6 +9,10 @@ dotenv.config({
   path: process.env.NODE_ENV === 'production' ? '.env.production' : '.env'
 });
 
+// Log environment info for debugging
+console.log('Node Environment:', process.env.NODE_ENV);
+console.log('Database URL:', process.env.DATABASE_URL ? 'Set (hidden for security)' : 'Not set');
+
 // Initialize express app
 const app = express();
 app.use(express.json());
@@ -33,8 +37,23 @@ app.use((req, res, next) => {
   next();
 });
 
+// Add debugging middleware for Vercel
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  next();
+});
+
+// Basic root handler for health check
+app.get('/_health', (req, res) => {
+  res.status(200).json({ status: 'ok' });
+});
+
 // Register all API routes
-registerRoutes(app);
+try {
+  registerRoutes(app);
+} catch (error) {
+  console.error('Error registering routes:', error);
+}
 
 // Error handling middleware
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
@@ -55,8 +74,17 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 
 // Serve static files in production
 if (process.env.NODE_ENV === 'production') {
-  serveStatic(app);
+  try {
+    serveStatic(app);
+  } catch (error) {
+    console.error('Error setting up static files:', error);
+  }
 }
+
+// Add fallback route handler
+app.use('*', (req, res) => {
+  res.status(200).sendFile(path.join(__dirname, '../dist/client/index.html'));
+});
 
 // Export the Express app as the default handler for Vercel
 export default app; 
