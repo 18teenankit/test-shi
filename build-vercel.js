@@ -12,7 +12,6 @@ const distDir = path.join(rootDir, 'dist');
 const clientDir = path.join(distDir, 'client');
 const uploadsDir = path.join(clientDir, 'uploads');
 const apiDir = path.join(rootDir, 'api');
-const apiBuildDir = path.join(apiDir, 'build');
 
 console.log(`[Vercel Build] Starting simplified build process at ${new Date().toISOString()}`);
 
@@ -30,11 +29,6 @@ if (!fs.existsSync(clientDir)) {
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir);
   console.log('[Vercel Build] Created uploads directory');
-}
-
-if (!fs.existsSync(apiBuildDir)) {
-  fs.mkdirSync(apiBuildDir, { recursive: true });
-  console.log('[Vercel Build] Created API build directory');
 }
 
 // Try to build the client with Vite
@@ -161,18 +155,6 @@ if (fs.existsSync(uploadsSourceDir)) {
   }
 }
 
-// Build the API handler
-console.log('[Vercel Build] Building API handler...');
-try {
-  fs.copyFileSync(
-    path.join(apiDir, 'index.js'), 
-    path.join(apiBuildDir, 'index.js')
-  );
-  console.log('[Vercel Build] API handler copied successfully');
-} catch (error) {
-  console.error('[Vercel Build] Failed to build API handler:', error.message);
-}
-
 // Create build info file for debugging
 const buildInfo = {
   timestamp: new Date().toISOString(),
@@ -180,7 +162,7 @@ const buildInfo = {
   node_version: process.version,
   files: {
     client: fs.existsSync(clientDir) ? fs.readdirSync(clientDir) : [],
-    api: fs.existsSync(apiBuildDir) ? fs.readdirSync(apiBuildDir) : []
+    api: fs.existsSync(apiDir) ? fs.readdirSync(apiDir) : []
   }
 };
 

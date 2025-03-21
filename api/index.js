@@ -19,13 +19,17 @@ export default function handler(req, res) {
       status: 'ok',
       message: 'API is operational',
       timestamp: new Date().toISOString(),
-      environment: process.env.NODE_ENV || 'development'
+      environment: process.env.NODE_ENV || 'development',
+      version: '1.0.0'
     });
   }
   
   // Health check endpoint
   if (req.url === '/api/health' || req.url === '/_health') {
-    return res.status(200).json({ status: 'ok' });
+    return res.status(200).json({ 
+      status: 'healthy',
+      uptime: process.uptime()
+    });
   }
   
   // Generic response for other API routes
