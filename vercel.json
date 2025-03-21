@@ -1,45 +1,20 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "api/index.js",
-      "use": "@vercel/node",
-      "config": {
-        "includeFiles": [
-          "dist/**",
-          "client/**",
-          "uploads/**",
-          ".env.production",
-          "api/fallback.html"
-        ]
-      }
+  "buildCommand": "npm run vercel-build",
+  "outputDirectory": "dist/client",
+  "framework": null,
+  "rewrites": [
+    { 
+      "source": "/test.html", 
+      "destination": "/test.html" 
     },
-    {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist/client",
-        "buildCommand": "npm run vercel-build"
-      }
+    { 
+      "source": "/api/:path*", 
+      "destination": "/api/build/index.js" 
+    },
+    { 
+      "source": "/(.*)", 
+      "destination": "/index.html" 
     }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api"
-    },
-    {
-      "src": "/(.*\\.(js|css|ico|png|jpg|jpeg|svg|webp|json|txt|ttf|woff|woff2))",
-      "dest": "/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/api"
-    }
-  ],
-  "env": {
-    "NODE_ENV": "production",
-    "TS_NODE_PROJECT": "tsconfig.vercel.json",
-    "SKIP_TYPESCRIPT_CHECK": "true"
-  }
+  ]
 } 
