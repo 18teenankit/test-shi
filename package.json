@@ -12,12 +12,14 @@
     "db:up": "drizzle-kit up:pg",
     "db:migrate": "tsx scripts/migrate-data.ts",
     "db:setup": "tsx scripts/setup-db.ts",
+    "db:setup-cloud": "tsx scripts/setup-cloud-db.ts",
+    "db:migrate-to-cloud": "tsx scripts/migrate-to-cloud.ts",
+    "db:seed-cloud": "tsx scripts/seed-cloud-db.ts",
     "clean": "rimraf dist",
     "build:all": "tsx build.js",
     "prebuild": "npm run clean",
     "postbuild": "echo 'Build completed successfully!'"
   },
-
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
     "@jridgewell/trace-mapping": "^0.3.25",
@@ -59,6 +61,7 @@
     "cmdk": "^1.0.0",
     "connect-pg-simple": "^10.0.0",
     "date-fns": "^3.6.0",
+    "dotenv": "^16.4.7",
     "drizzle-orm": "^0.39.1",
     "drizzle-zod": "^0.7.0",
     "embla-carousel-react": "^8.3.0",
